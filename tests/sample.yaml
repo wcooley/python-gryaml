@@ -1,0 +1,63 @@
+graph_data:
+    node:
+        by_label:
+            ? !!python/tuple [person,employee,posix]
+            :
+                -   name: "Babs Jensen"
+                    title: Director
+                    mail: babs@example.com
+                    uid: babs
+                    uidNumber: 100
+                    gidNumber: 100
+                    homeDirectory: '/home/babs'
+                    loginShell: '/bin/bash'
+                -   name: "Bjorn Jensen"
+                    title: Manager
+                    mail: bjorn@example.com
+                    uid: bjorn
+                    uidNumber: 101
+                    gidNumber: 101
+                    homeDirectory: '/home/bjorn'
+                    loginShell: '/bin/bash'
+            ? !!python/object/apply:frozenset
+                ? 'person'
+                ? 'intern'
+            :
+                name: "Beezus Jensen"
+                title: "Office Assistant"
+                mail: beezus@example.com
+                uid: intern001
+        by_node:
+            -   labels:  !!set
+                    ? 'person'
+                    ? 'contact'
+                properties:
+                    name: 'Homer Simpson'
+                    mail: 'homer@example.com'
+            -   labels:
+                    - 'person'
+                    - 'contact'
+                properties:
+                    name: 'Marge Simpson'
+                    mail: 'marge@example.com'
+
+    relationship:
+        by_type:
+          - reports_to:
+                # `from` and `to` become:
+                # MATCH (from: ${from})
+                # MATCH (to: ${to})
+                #
+                -   from: person:{name:"Bjorn Jensen"}
+                    to: name="Babs Jensen"
+                    properties:
+                        - last_update: 2015-11-11
+        by_relationship:
+            # MERGE (from)-[:reports_to { ${properties}]->(to)
+            -   node:
+                    - person:{name:"Marge Simpson"}
+                    - person:{name:"Homer Simpson"}
+                relationship:
+                    - spouse_of
+                properties:
+                    - last_update: 2015-11-12
