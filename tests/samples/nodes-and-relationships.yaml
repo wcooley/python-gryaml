@@ -1,0 +1,138 @@
+- &node-movie-matrix !!python/object/apply:gryaml.node
+    - labels:
+        - 'Movie'
+    - properties:
+        title: 'The Matrix'
+        released: '1999'
+
+- &node-movie-matrix-reloaded !!python/object/apply:gryaml.node
+    - labels:
+        - 'Movie'
+    - properties:
+        title: 'The Matrix Reloaded'
+        released: '2003'
+
+- &node-movie-v-for-vendetta !!python/object/apply:gryaml.node
+    - labels:
+        - 'Movie'
+    - properties:
+        title: 'V for Vendetta'
+        released: '2006'
+
+- &node-person-keanu !!python/object/apply:gryaml.node
+    - labels:
+        - 'Person'
+    - properties:
+        name: 'Keanu Reeves'
+        born: '1964'
+
+- &node-person-carrie !!python/object/apply:gryaml.node
+    - labels:
+        - 'Person'
+    - properties:
+        name: 'Carrie-Anne Moss'
+        born: '1967'
+
+- &node-person-laurence !!python/object/apply:gryaml.node
+    - labels:
+        - 'Person'
+    - properties:
+        name: 'Laurence Fishburne'
+        born: '1961'
+
+- &node-person-lana !!python/object/apply:gryaml.node
+    - labels:
+        - 'Person'
+    - properties:
+        name: 'Lana Wachowski'
+        born: '1965'
+
+- &node-person-natalie !!python/object/apply:gryaml.node
+    - labels:
+        - 'Person'
+    - properties:
+        name: 'Natalie Portman'
+        born: '1981'
+
+- &node-person-john !!python/object/apply:gryaml.node
+    - labels:
+        - 'Person'
+    - properties:
+        name: 'John Hurt'
+        born: '1940'
+
+- &rel-keanu-matrix !!python/object/apply:gryaml.rel
+    - *node-person-keanu
+    - 'ACTED_IN'
+    - *node-movie-matrix
+    - properties:
+        roles: ['Neo']
+
+- &rel-carrie-matrix !!python/object/apply:gryaml.rel
+    - *node-person-carrie
+    - 'ACTED_IN'
+    - *node-movie-matrix
+    - properties:
+        roles: ['Trinity']
+
+- &rel-laurence-matrix !!python/object/apply:gryaml.rel
+    - *node-person-laurence
+    - 'ACTED_IN'
+    - *node-movie-matrix
+    - properties:
+        roles: ['Morpheus']
+
+- &rel-lana-matrix !!python/object/apply:gryaml.rel
+    - *node-person-lana
+    - 'DIRECTED'
+    - *node-movie-matrix
+
+- &rel-keanu-matrix-reloaded !!python/object/apply:gryaml.rel
+    - *node-person-keanu
+    - 'ACTED_IN'
+    - *node-movie-matrix-reloaded
+    - properties:
+        roles: ['Neo']
+
+- &rel-carrie-matrix-reloaded !!python/object/apply:gryaml.rel
+    - *node-person-carrie
+    - 'ACTED_IN'
+    - *node-movie-matrix-reloaded
+    - properties:
+        roles: ['Trinity']
+
+- &rel-laurence-matrix-reloaded !!python/object/apply:gryaml.rel
+    - *node-person-laurence
+    - 'ACTED_IN'
+    - *node-movie-matrix-reloaded
+    - properties:
+        roles: ['Morpheus']
+
+- &rel-lana-matrix-reloaded !!python/object/apply:gryaml.rel
+    - *node-person-lana
+    - 'DIRECTED'
+    - *node-movie-matrix-reloaded
+
+- &rel-natalie-v-for-vendetta !!python/object/apply:gryaml.rel
+    - *node-person-natalie
+    - 'ACTED_IN'
+    - *node-movie-v-for-vendetta
+    - properties:
+        roles: ['Evey Hammond']
+
+- &rel-john-v-for-vendetta !!python/object/apply:gryaml.rel
+    - *node-person-john
+    - 'ACTED_IN'
+    - *node-movie-v-for-vendetta
+    - properties:
+        roles: ['High Chancellor Adam Sutler']
+
+- &rel-lana-produced-v-for-vendetta !!python/object/apply:gryaml.rel
+    - *node-person-lana
+    - 'PRODUCED'
+    - *node-movie-v-for-vendetta
+
+- &rel-lana-wrote-v-for-vendetta !!python/object/apply:gryaml.rel
+    - *node-person-lana
+    - 'WROTE'
+    - *node-movie-v-for-vendetta

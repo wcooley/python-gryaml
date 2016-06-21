@@ -1,0 +1,39 @@
+
+- &node-movie-matrix !!python/object/apply:gryaml.node
+    - labels:
+        - 'Movie'
+    - properties:
+        title: 'The Matrix'
+        released: '1999'
+
+- &node-person-lana !!python/object/apply:gryaml.node
+    - labels:
+        - 'Person'
+    - properties:
+        name: 'Lana Wachowski'
+        born: '1965'
+
+# Relationship without properties
+- &rel-lana-matrix !!python/object/apply:gryaml.rel
+    - *node-person-lana
+    - 'DIRECTED'
+    - *node-movie-matrix
+
+- &node-person-keanu !!python/object/apply:gryaml.node
+    - labels:
+        - 'Person'
+    - properties:
+        name: 'Keanu Reeves'
+        born: '1964'
+
+# Relationship with properties
+- &rel-keanu-matrix !!python/object/apply:gryaml.rel
+    - *node-person-keanu
+    - 'ACTED_IN'
+    - *node-movie-matrix
+    - properties:
+        roles: ['Neo']
+        costume: 'black trenchcoat'
+        hands: 2
+        feet: 2
+        hair: 'slicked back'
