@@ -3,15 +3,7 @@
 import os
 import sys
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-
-
-if sys.argv[-1] == 'publish':
-    os.system('python setup.py sdist upload')
-    sys.exit()
+from setuptools import setup
 
 readme = open('README.rst').read()
 doclink = """
@@ -23,7 +15,7 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='gryaml',
-    version='0.1.0',
+    use_scm_version=True,
     description='Represent Neo4j graph data as YAML.',
     long_description=readme + '\n\n' + doclink + '\n\n' + history,
     author='Wil Cooley',
@@ -35,7 +27,10 @@ setup(
     package_dir={'gryaml': 'gryaml'},
     include_package_data=True,
     install_requires=[
+        'py2neo>=2.0,<3',
+        'pyyaml',
     ],
+    setup_requires=['setuptools_scm'],
     license='MIT',
     zip_safe=False,
     keywords='gryaml',
