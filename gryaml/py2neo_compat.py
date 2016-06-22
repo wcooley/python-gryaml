@@ -9,7 +9,7 @@ elif py2neo.__version__.startswith('2.0'):
     py2neo_ver = 2
 elif py2neo.__version__.startswith('3'):
     py2neo_ver = 3
-    raise NotImplementedError("py2neo %d not yet supported" % py2neo.__version__)
+    raise NotImplementedError("py2neo %d not yet supported" % py2neo_ver)
 else:
     raise NotImplementedError("py2neo %d not supported" % py2neo.__version__)
 
@@ -152,8 +152,8 @@ def resolve_rel_properties(properties):
     nodes are represented.
     """
     properties = properties or {}  # Ensure not default `None`
-    # Support properties being either the value of a single-key mapping with key 'properties'
-    # or directly
+    # Support properties being either the value of a single-key mapping with
+    # key 'properties' or directly
     properties = properties['properties'] \
         if is_properties_map(properties) \
         else properties
