@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-
-import os
-import sys
+"""Setuptools setup."""
 
 from setuptools import setup
 
@@ -27,6 +25,7 @@ setup(
     package_dir={'gryaml': 'gryaml'},
     include_package_data=True,
     install_requires=[
+        'boltons',
         'py2neo>=2.0,<3',
         'pyyaml',
     ],
