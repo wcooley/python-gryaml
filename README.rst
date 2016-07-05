@@ -83,6 +83,8 @@ load using the ``!!python/object/apply`` YAML
 Versions
 --------
 
+Python
+    Tested with both Python 2.7 and 3.5.
 Neo4j
     Should work with anything >= 2.0 but < 3. Tested with 2.3.2. Running the
     tests requires 2.3 as it uses the ``DETACH DELETE`` feature to drop the
