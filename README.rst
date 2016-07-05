@@ -44,33 +44,33 @@ load using the ``!!python/object/apply`` YAML
 
    ::
 
-    import gryaml
+       import gryaml
 
-    gryaml.connect('http://localhost:7474')
+       gryaml.connect('http://localhost:7474')
 
 #. Import :mod:`pyyaml` and load the data:
 
    ::
 
-    import yaml
-    yaml.load("""
-    - &node-foo !!python/object/apply:gryaml.node
-      - labels:
-        - 'Fooer'
-      - properties:
-        prop1: 'flim'
-    - &node-bar !!python/object/apply:gryaml.node
-      - labels:
-        - 'Barer'
-      - properties:
-        prop1: 'flam'
-    - !!python/object/apply:gryaml.rel
-      - *node-foo
-      - 'RELATES_TO'
-      - *node-bar
-      - properties:
-        bletch: 'xyzzy'
-    """)
+        import yaml
+        yaml.load("""
+        - &node-foo !!python/object/apply:gryaml.node
+          - labels:
+            - 'Fooer'
+          - properties:
+            prop1: 'flim'
+        - &node-bar !!python/object/apply:gryaml.node
+          - labels:
+            - 'Barer'
+          - properties:
+            prop1: 'flam'
+        - !!python/object/apply:gryaml.rel
+          - *node-foo
+          - 'RELATES_TO'
+          - *node-bar
+          - properties:
+            bletch: 'xyzzy'
+        """)
 
 
    The ``&node-x`` are YAML
