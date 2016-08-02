@@ -46,4 +46,9 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
+    entry_points={
+        'console_scripts': [
+            'gryaml-load = gryaml.__main__:__main__',
+        ],
+    },
 )
