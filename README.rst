@@ -53,6 +53,9 @@ through the environment variable ``NEO4J_URI``.
 Future
 ------
 
+* Make nodes just dicts with 'labels' and 'properties' keys. Maybe make rels
+  dicts with 'head', 'tail', 'type' and 'properties' keys too?
+* Make it easier to load without creating in the database?
 * Custom YAML representer & constructor. Currently it is not possible to
   automatically dump Node and Relationship objects in a reasonable fashion.
 * `py2neo` & Neo4j v3 support.
