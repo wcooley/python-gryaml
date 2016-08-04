@@ -1,3 +1,6 @@
+"""Load Neo4j nodes & relationships from YAML files."""
+
+import argparse
 import os
 import sys
 
@@ -6,36 +9,48 @@ from py2neo import Graph
 
 import gryaml
 
-def __main__(argv=sys.argv):
-    if '--help' in argv or len(argv) < 2:
-        print('Usage: gryaml-load [neo4j_uri] file*')
-        print('Environment variable "NEO4J_URI" may also be used')
-        sys.exit()
 
-    if len(argv) == 2 and os.environ.get('NEO4J_URI', None):
-        neo4j_uri = os.environ['NEO4J_URI']
-        yaml_input = argv[1:]
-    else:
-        neo4j_uri = argv[1]
-        yaml_input = argv[2:]
+def parse_args(args=None):
+    parser = argparse.ArgumentParser(description=__doc__)
 
-    print('Using Neo4j database at {}'.format(neo4j_uri))
-    graph = Graph(neo4j_uri)
+    neo4j_uri_env = os.environ.get('NEO4J_URI', None)
+    parser.add_argument('--neo4j-uri', action='store',
+                        default=neo4j_uri_env,  # toggle req based on env var
+                        required=not bool(neo4j_uri_env),
+                        help='URI for Neo4j; environment variable'
+                             ' "NEO4J_URI" may also be used.')
+    parser.add_argument('--drop', action='store_true',
+                        help='Drop database before loading.')
+    parser.add_argument('yaml_files', nargs='*')
 
-    # Ensure at least a minimally functioning conection
+    args = parser.parse_args(args)
+    return args
+
+
+def __main__():
+    config = parse_args()
+
+    print('Using Neo4j database at {}'.format(config.neo4j_uri))
+    graph = Graph(config.neo4j_uri)
+
+    # Ensure at least a minimally functioning connection
     graph.neo4j_version
 
-    print('Dropping database...')
-    cleanup_graph(graph)
+    # import sys, IPython; IPython.embed(); sys.exit()
+    if config.drop:
+        print('Dropping database...')
+        cleanup_graph(graph)
 
-    gryaml.connect(neo4j_uri)
+    gryaml.connect(config.neo4j_uri)
 
-    print('Loading YAML files...')
+    if config.yaml_files:
+        print('Loading YAML files...')
 
-    for yaml_file in yaml_input:
+    for yaml_file in config.yaml_files:
         print(yaml_file)
         with open(yaml_file) as stream:
             yaml.load(stream)
+
 
 def schema_constraints(graph):
     # type: (Graph) -> (str, List[str], str)
