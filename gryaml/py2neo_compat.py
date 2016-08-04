@@ -39,6 +39,22 @@ def connect(uri=None, graph=None):
 
     return graphdb
 
+def py2neo16_create(entity):
+    global graphdb
+    return first(graphdb.create(entity))
+
+def py2neo20_create(entity):
+    global graphdb
+    return first(graphdb.create(entity))
+
+
+if py2neo_ver == 1:
+    _create = py2neo16_create
+elif py2neo_ver == 2:
+    _create = py2neo20_create
+
+del py2neo16_create, py2neo20_create
+
 
 def py2neo16_node(*labels, **properties):
     """Implement a Py2neo 2.0-compatible `node` factory.
@@ -46,9 +62,7 @@ def py2neo16_node(*labels, **properties):
     Version 1.6 did not support adding labels (which ordinarily would only be
     possible to add *after* node creation).
     """
-    global graphdb
-
-    new_node = first(graphdb.create(py2neo_node(**properties)))
+    new_node = _create(py2neo_node(**properties))
     new_node.add_labels(*labels)
 
     return new_node
@@ -59,9 +73,7 @@ def py2neo20_node(*labels, **properties):
 
     Requires a module-global `graphdb` connection.
     """
-    global graphdb
-
-    return first(graphdb.create(py2neo_node(*labels, **properties)))
+    return _create(py2neo_node(*labels, **properties))
 
 
 if py2neo_ver == 1:
@@ -166,5 +178,5 @@ def rel(head, reltype, tail, properties=None):
     properties = resolve_rel_properties(properties)
     # print('properties: {!r}'.format(properties))
     path = py2neo_rel(head, reltype, tail, **properties)
-    results = first(graphdb.create(path))
+    results = first(_create(path))
     return results
