@@ -39,14 +39,22 @@ def connect(uri=None, graph=None):
 
     return graphdb
 
+# Creating Nodes & Relationships in a database is only required for 1.6.
 def py2neo16_create(entity):
     global graphdb
     return first(graphdb.create(entity))
 
 def py2neo20_create(entity):
     global graphdb
-    return first(graphdb.create(entity))
 
+    result = entity
+    try:
+        if graphdb:
+            result = first(graphdb.create(entity))
+    except NameError:
+        pass
+
+    return result
 
 if py2neo_ver == 1:
     _create = py2neo16_create
