@@ -44,11 +44,7 @@ def test_relationship_structures(graphdb):
     result = graphdb.cypher.execute('MATCH (n)-[r]->(o) RETURN *')
     assert len(result) == 2  # 2 relationships
     result = graphdb.cypher.execute('MATCH (p)-[r:DIRECTED]->(m) RETURN p,r,m')
-    assert len(result) == 1
-    person, relationship, movie = first(result)
-    assert person['name'] == 'Lana Wachowski'
-    assert relationship.type == 'DIRECTED'
-    assert movie['title'] == 'The Matrix'
+    assert_lana_directed_matrix(result)
 
 
 @pytest.mark.integration
@@ -58,6 +54,11 @@ def test_complex_related_graph(graphdb):
     assert len(result) == 21
     result = graphdb.cypher.execute(
         'MATCH (p)-[r:DIRECTED]->(m{title:"The Matrix"}) RETURN p,r,m')
+    assert_lana_directed_matrix(result)
+
+
+def assert_lana_directed_matrix(result):
+    """Assert given relationship & nodes."""
     assert len(result) == 1
     person, relationship, movie = first(result)
     assert person['name'] == 'Lana Wachowski'
