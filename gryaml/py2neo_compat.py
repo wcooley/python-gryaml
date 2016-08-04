@@ -141,15 +141,8 @@ def node(*args):
     """
     labels = first(arg['labels']
                    for arg in args if is_label_map(arg)) or []
-    # labels = labels.get('labels', []) if labels else []
     properties = first(arg['properties']
                        for arg in args if is_properties_map(arg)) or {}
-    # properties = properties.get('properties', {}) if properties else {}
-
-    # print('labels: {!r}'.format(labels))
-    # print('properties: {!r}'.format(properties))
-
-    # return labels, properties
     return compat_node(labels, properties)
 
 
@@ -184,7 +177,6 @@ def resolve_rel_properties(properties):
 def rel(head, reltype, tail, properties=None):
     """Create relationships."""
     properties = resolve_rel_properties(properties)
-    # print('properties: {!r}'.format(properties))
     path = py2neo_rel(head, reltype, tail, **properties)
     results = first(_create(path))
     return results
