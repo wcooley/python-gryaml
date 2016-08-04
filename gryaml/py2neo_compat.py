@@ -166,5 +166,5 @@ def rel(head, reltype, tail, properties=None):
     properties = resolve_rel_properties(properties)
     # print('properties: {!r}'.format(properties))
     path = py2neo_rel(head, reltype, tail, **properties)
-    results = graphdb.create(path)
+    results = first(graphdb.create(path))
     return results
