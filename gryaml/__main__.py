@@ -54,7 +54,7 @@ def schema_constraints(graph):
 
 
 def schema_indexes(graph):
-    # type: (py2neo.Graph) -> (str, List[str])
+    # type: (Graph) -> (str, List[str])
     """Query iterable list of *all* schema indexes.
 
     This works around the fact that, in Neo4j 2.3 and :mod:`py2neo` 2.0.8 at
@@ -69,7 +69,7 @@ def schema_indexes(graph):
 
 
 def cleanup_graph(graph):
-    # type: (py2neo.Graph) -> None
+    # type: (Graph) -> None
     """Delete all entities & drop indexes & constraints."""
     constraint_dispatch = {
         'UNIQUENESS': graph.schema.drop_uniqueness_constraint,
