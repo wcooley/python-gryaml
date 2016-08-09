@@ -15,7 +15,7 @@ from gryaml.py2neo_compat import Node, Relationship
 def graphdb():
     """Fixture connecting to graphdb."""
     if 'NEO4J_URI' not in os.environ:
-        raise Exception('Need NEO4J_URI env var set')
+        pytest.skip('Need NEO4J_URI environment variable set')
     graphdb = gryaml.connect(uri=os.environ['NEO4J_URI'])
     graphdb.cypher.execute('MATCH (n) DETACH DELETE n')
     return graphdb
