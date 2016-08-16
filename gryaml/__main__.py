@@ -2,15 +2,20 @@
 
 import argparse
 import os
-import sys
 
 import yaml
-from py2neo import Graph
+
+try:
+    from typing import Any, Iterator, Tuple  # noqa
+    from .py2neo_compat import Graph  # noqa
+except ImportError:
+    """Module :mod:`typing` not required for Py27-compatible type comments."""
 
 import gryaml
 
 
 def parse_args(args=None):
+    # type: (List) -> Any
     parser = argparse.ArgumentParser(description=__doc__)
 
     neo4j_uri_env = os.environ.get('NEO4J_URI', None)
@@ -28,10 +33,12 @@ def parse_args(args=None):
 
 
 def __main__():
+    # type: () -> None
     config = parse_args()
 
     print('Using Neo4j database at {}'.format(config.neo4j_uri))
-    graph = Graph(config.neo4j_uri)
+
+    graph = gryaml.connect(config.neo4j_uri)
 
     # Ensure at least a minimally functioning connection
     graph.neo4j_version
@@ -40,8 +47,6 @@ def __main__():
     if config.drop:
         print('Dropping database...')
         cleanup_graph(graph)
-
-    gryaml.connect(config.neo4j_uri)
 
     if config.yaml_files:
         print('Loading YAML files...')
@@ -53,7 +58,7 @@ def __main__():
 
 
 def schema_constraints(graph):
-    # type: (Graph) -> (str, List[str], str)
+    # type: (Graph) -> Iterator[Tuple[str, List[str], str]]
     """Query iterable list of *all* schema constraints.
 
     This works around the fact that, in Neo4j 2.3 and :mod:`py2neo` 2.0.8 at
@@ -69,7 +74,7 @@ def schema_constraints(graph):
 
 
 def schema_indexes(graph):
-    # type: (Graph) -> (str, List[str])
+    # type: (Graph) -> List[Tuple[str, List[str]]]
     """Query iterable list of *all* schema indexes.
 
     This works around the fact that, in Neo4j 2.3 and :mod:`py2neo` 2.0.8 at

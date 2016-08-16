@@ -37,6 +37,18 @@ setup(
     tests_require=tests_require,
     extras_require={
         'test': tests_require,
+        'lint': [
+            'flake8',
+            'mccabe',
+            'mypy-lang',
+            'pep8',
+            'pep8-naming',
+            'pycodestyle',
+            'pyflakes',
+            'pylint',
+            'typed_ast',
+            'typing',
+        ],
     },
     license='MIT',
     zip_safe=False,
