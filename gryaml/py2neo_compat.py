@@ -1,8 +1,8 @@
 """Compatability layer for :mod:`py2neo` versions."""
 
-import py2neo
 from boltons.iterutils import first
 
+import py2neo
 if py2neo.__version__.startswith('1.6'):
     py2neo_ver = 1
 elif py2neo.__version__.startswith('2.0'):
