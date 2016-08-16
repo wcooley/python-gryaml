@@ -69,23 +69,28 @@ elif py2neo_ver == 2:
 del py2neo16_create, py2neo20_create
 
 
-def py2neo16_node(*labels, **properties):
+def py2neo16_node(labels=None, properties=None):
     """Implement a Py2neo 2.0-compatible `node` factory.
 
     Version 1.6 did not support adding labels (which ordinarily would only be
     possible to add *after* node creation).
     """
-    new_node = _create(py2neo_node(**properties))
+    labels = labels or []
+    properties = properties or {}
+
+    new_node = _create(py2neo_node(properties))
     new_node.add_labels(*labels)
 
     return new_node
 
 
-def py2neo20_node(*labels, **properties):
+def py2neo20_node(labels=None, properties=None):
     """Py2neo `node` factory.
 
     Requires a module-global `graphdb` connection.
     """
+    labels = labels or []
+    properties = properties or {}
     return _create(py2neo_node(*labels, **properties))
 
 
@@ -168,7 +173,7 @@ def node(*args):
     return compat_node(labels, properties)
 
 
-def resolve_rel_properties(properties):
+def resolve_rel_properties(properties=None):
     """Extract properties from rel structure.
 
     This supports the properties of a rel being either an "arg map" with key
