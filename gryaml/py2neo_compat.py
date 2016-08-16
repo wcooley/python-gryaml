@@ -15,8 +15,8 @@ else:
 
 if py2neo_ver == 1:
     from py2neo.neo4j import GraphDatabaseService as Graph  # noqa
-    from py2neo.neo4j import Node, Relationship  # noqa
-    from py2neo.neo4j import _node as py2neo_node, py2neo_rel  # noqa
+    from py2neo.neo4j import CypherQuery, Node, Relationship  # noqa
+    from py2neo import node as py2neo_node, rel as py2neo_rel  # noqa
 elif py2neo_ver == 2:
     from py2neo import Graph, Node, Relationship  # noqa
     from py2neo import node as py2neo_node, rel as py2neo_rel  # noqa
@@ -87,6 +87,23 @@ elif py2neo_ver == 2:
     compat_node = py2neo20_node
 
 del py2neo16_node, py2neo20_node
+
+
+if py2neo_ver == 1:
+
+    def _cypher_execute(graph, query, **params):
+        return CypherQuery(graph, query).execute(**params)
+
+    def _cypher_stream(graph, query, **params):
+        return CypherQuery(graph, query).stream(**params)
+
+elif py2neo_ver == 2:
+
+    def _cypher_execute(graph, query, **params):
+        return graph.cypher.execute(query, **params)
+
+    def _cypher_stream(graph, query, **params):
+        return graph.cypher.stream(query, **params)
 
 
 def is_arg_map(argname, mapping):
