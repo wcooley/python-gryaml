@@ -30,7 +30,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'boltons',
-        'py2neo<3',
+        'py2neo',
         'pyyaml',
     ],
     setup_requires=['setuptools_scm'],
