@@ -1,1 +1,6 @@
+# This makes PyCharm happy
 wheel>=0.22
+py2neo
+boltons
+pyyaml
+pytest
