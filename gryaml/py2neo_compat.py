@@ -1,4 +1,5 @@
 """Compatability layer for :mod:`py2neo` versions."""
+import warnings
 
 from boltons.iterutils import first
 
@@ -14,7 +15,7 @@ elif py2neo.__version__.startswith('2.0'):
     py2neo_ver = 2
 elif py2neo.__version__.startswith('3'):
     py2neo_ver = 3
-    raise NotImplementedError("py2neo %d not yet supported" % py2neo_ver)
+    warnings.warn("py2neo %d not yet supported" % py2neo_ver)
 else:
     raise NotImplementedError("py2neo %d not supported" % py2neo.__version__)
 
