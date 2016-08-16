@@ -39,9 +39,17 @@ def connect(uri=None, graph=None):
 
     return graphdb
 
+
+def _not_none(o):
+    return o is not None
+
+
 # Creating Nodes & Relationships in a database is only required for 1.6.
 def py2neo16_create(entity):
-    return first(graphdb.create(entity))
+    # An empty 1.6 Node evaluates to False, so override the default way `first`
+    # tests for falsity or we'll return None.
+    return first(graphdb.create(entity), key=_not_none)
+
 
 def py2neo20_create(entity):
     result = entity
