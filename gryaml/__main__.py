@@ -5,7 +5,6 @@ import os
 import sys
 
 import yaml
-from py2neo import Graph
 
 try:
     from typing import Any, Iterator, Tuple  # noqa
@@ -39,7 +38,8 @@ def __main__():
     config = parse_args()
 
     print('Using Neo4j database at {}'.format(config.neo4j_uri))
-    graph = Graph(config.neo4j_uri)
+
+    graph = gryaml.connect(config.neo4j_uri)
 
     # Ensure at least a minimally functioning connection
     graph.neo4j_version
@@ -48,8 +48,6 @@ def __main__():
     if config.drop:
         print('Dropping database...')
         cleanup_graph(graph)
-
-    gryaml.connect(config.neo4j_uri)
 
     if config.yaml_files:
         print('Loading YAML files...')
