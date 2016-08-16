@@ -25,6 +25,8 @@ def graphdb():
 @pytest.yield_fixture
 def graphdb_offline():
     """Ensure the database is not connected."""
+    if py2neo_ver < 2:
+        pytest.skip('Offline not supported in py2neo < 2')
     neo4j_uri_env = os.environ.get('NEO4J_URI', None)
     if neo4j_uri_env:
         del os.environ['NEO4J_URI']
