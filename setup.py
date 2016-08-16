@@ -11,6 +11,10 @@ Documentation
 The full documentation is at http://gryaml.rtfd.org."""
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
+tests_require = [
+    'pytest'
+]
+
 setup(
     name='gryaml',
     use_scm_version=True,
@@ -30,6 +34,10 @@ setup(
         'pyyaml',
     ],
     setup_requires=['setuptools_scm'],
+    tests_require=tests_require,
+    extras_require={
+        'test': tests_require,
+    },
     license='MIT',
     zip_safe=False,
     keywords='gryaml',
