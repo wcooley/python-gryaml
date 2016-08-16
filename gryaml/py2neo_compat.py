@@ -55,7 +55,7 @@ def py2neo20_create(entity):
     result = entity
     try:
         if graphdb:
-            result = first(graphdb.create(entity))
+            result = first(graphdb.create(entity), key=_not_none)
     except NameError:
         pass
 
@@ -200,5 +200,5 @@ def rel(head, reltype, tail, properties=None):
     """Create relationships."""
     properties = resolve_rel_properties(properties)
     path = py2neo_rel(head, reltype, tail, **properties)
-    results = first(_create(path))
+    results = first(_create(path), key=_not_none)
     return results
