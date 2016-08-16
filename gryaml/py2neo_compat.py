@@ -60,6 +60,8 @@ def _not_none(o):
 
 
 # Creating Nodes & Relationships in a database is only required for 1.6.
+# Native _create_ can create multiple entities but this cannot
+
 def py2neo16_create(entity):
     # type: (Py2NeoEntity) -> Py2NeoEntity
     # An empty 1.6 Node evaluates to False, so override the default way `first`
