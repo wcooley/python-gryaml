@@ -11,6 +11,10 @@ Documentation
 The full documentation is at http://gryaml.rtfd.org."""
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
+tests_require = [
+    'pytest'
+]
+
 setup(
     name='gryaml',
     use_scm_version=True,
@@ -26,10 +30,26 @@ setup(
     include_package_data=True,
     install_requires=[
         'boltons',
-        'py2neo>=2.0,<3',
+        'py2neo<3',
         'pyyaml',
     ],
     setup_requires=['setuptools_scm'],
+    tests_require=tests_require,
+    extras_require={
+        'test': tests_require,
+        'lint': [
+            'flake8',
+            'mccabe',
+            'mypy-lang',
+            'pep8',
+            'pep8-naming',
+            'pycodestyle',
+            'pyflakes',
+            'pylint',
+            'typed_ast',
+            'typing',
+        ],
+    },
     license='MIT',
     zip_safe=False,
     keywords='gryaml',
@@ -46,4 +66,9 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
+    entry_points={
+        'console_scripts': [
+            'gryaml-load = gryaml.__main__:__main__',
+        ],
+    },
 )
