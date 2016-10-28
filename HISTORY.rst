@@ -3,6 +3,14 @@
 History
 -------
 
+0.3.0 (2016-10-28)
+++++++++++++++++++
+
+* Fix so that it should mostly work with py2neo 1.6 in addition to py2neo 2.0.
+  py2neo 1.6 does not support abstract nodes without labels, so it must be used
+  against a live database, whereas py2neo 2.0 does not. (py2neo v3 support is
+  in progress.)
+
 0.2.0 (2016-07-05)
 ++++++++++++++++++
 
