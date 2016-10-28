@@ -46,7 +46,7 @@ def connect(uri=None, graph=None):
     """Instantiate a module-level graph database connection."""
     global graphdb
 
-    if graph:
+    if graph is not None:
         graphdb = graph
     else:
         graphdb = Graph(uri)

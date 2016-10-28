@@ -3,6 +3,12 @@
 History
 -------
 
+0.3.1 (2016-10-28)
+++++++++++++++++++
+
+* Fix assumption that a non-*None* instance of
+  *GraphDatabaseService* in py2neo 1.6 would not be *False*.
+
 0.3.0 (2016-10-28)
 ++++++++++++++++++
 
