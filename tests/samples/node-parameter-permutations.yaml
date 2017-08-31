@@ -1,13 +1,13 @@
-- !!python/object/apply:gryaml.node
+- !gryaml.node
     - labels:
         - 'person'
     - properties:
         name: 'Bob Newhart'
         occupation: 'Comedian'
-- !!python/object/apply:gryaml.node
+- !gryaml.node
     - labels:
         - 'person'
-- !!python/object/apply:gryaml.node
+- !gryaml.node
     - properties:
         name: 'Bob Barker'
         occupation: 'Game Show Host'
