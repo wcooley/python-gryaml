@@ -2,7 +2,7 @@
 
 import yaml
 
-from py2neo import Node, Relationship
+from .py2neo_compat import Node, Relationship
 # from py2neo.cypher.core import Record
 
 from . import node, rel
@@ -14,7 +14,6 @@ node_tag = u'!gryaml.node'
 rel_tag = u'!gryaml.rel'
 
 
-# This works
 def node_representer(dumper, data):
     """Represent."""
     yaml_data = [
@@ -24,22 +23,18 @@ def node_representer(dumper, data):
     return dumper.represent_sequence(node_tag, yaml_data,
                                      flow_style=False)
 
+
 yaml.add_representer(Node, node_representer)
 
 
-# This does not work - `construct_sequence` returns empty structures.
 def node_constructor(loader, yaml_node):
     """Construct."""
-    # node_data = loader.construct_sequence(yaml_node)
-    # print("node_data: {!r}".format(node_data))
-    # import pdb
-    # pdb.set_trace()
-    return node(*loader.construct_sequence(yaml_node))
+    return node(*(loader.construct_sequence(yaml_node, deep=True)))
+
 
 yaml.add_constructor(node_tag, node_constructor)
 
 
-# This works
 def rel_representer(dumper, data):
     """Represent."""
     yaml_data = [
@@ -50,13 +45,13 @@ def rel_representer(dumper, data):
     ]
     return dumper.represent_sequence(rel_tag, yaml_data, flow_style=False)
 
+
 yaml.add_representer(Relationship, rel_representer)
 
 
-# Probably doesn't work
 def rel_constructor(loader, yaml_node):
     """Construct."""
-    return rel(*loader.construct_sequence(yaml_node))
+    return rel(*loader.construct_sequence(yaml_node, deep=True))
 
 yaml.add_constructor(rel_tag, rel_constructor)
 
