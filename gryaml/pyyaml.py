@@ -2,7 +2,7 @@
 
 import yaml
 
-from .py2neo_compat import Node, Relationship
+from py2neo_compat import Node, Relationship
 # from py2neo.cypher.core import Record
 
 from . import node, rel

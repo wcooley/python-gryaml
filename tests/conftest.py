@@ -10,7 +10,7 @@ import os
 import pytest  # noqa
 
 import gryaml
-from gryaml.py2neo_compat import _cypher_execute, py2neo_ver
+from py2neo_compat import py2neo_ver
 
 
 @pytest.fixture
@@ -19,7 +19,7 @@ def graphdb():
     if 'NEO4J_URI' not in os.environ:
         pytest.skip('Need NEO4J_URI environment variable set')
     graphdb = gryaml.connect(uri=os.environ['NEO4J_URI'])
-    _cypher_execute(graphdb, 'MATCH (n) DETACH DELETE n')
+    graphdb.cypher.execute('MATCH (n) DETACH DELETE n')
     return graphdb
 
 @pytest.yield_fixture
