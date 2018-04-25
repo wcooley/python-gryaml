@@ -10,8 +10,23 @@ import os
 import pytest  # noqa
 
 import gryaml
+import py2neo
+import yaml
+
 from py2neo_compat import py2neo_ver
 
+def pytest_report_header(config, startdir):
+    lines = []
+
+    if 'NEO4J_URI' in os.environ:
+        lines.append('Neo4J URI: %s' % os.environ['NEO4J_URI'])
+
+    lines.append('py2neo: {0.__version__}'
+                 ' pyyaml: {1.__version__}'
+                 ' libyaml: {1.__with_libyaml__}'.format(py2neo, yaml))
+    lines.append('forked: %s' % config.getvalue('forked'))
+
+    return lines
 
 @pytest.fixture
 def graphdb():
