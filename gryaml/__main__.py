@@ -7,7 +7,7 @@ import yaml
 
 try:
     from typing import Any, Iterator, Tuple  # noqa
-    from .py2neo_compat import Graph  # noqa
+    from py2neo_compat import Graph  # noqa
 except ImportError:
     """Module :mod:`typing` not required for Py27-compatible type comments."""
 
