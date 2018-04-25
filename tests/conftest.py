@@ -19,7 +19,7 @@ def graphdb():
     if 'NEO4J_URI' not in os.environ:
         pytest.skip('Need NEO4J_URI environment variable set')
     graphdb = gryaml.connect(uri=os.environ['NEO4J_URI'])
-    graphdb.cypher.execute('MATCH (n) DETACH DELETE n')
+    graphdb.delete_all()
     return graphdb
 
 @pytest.yield_fixture
