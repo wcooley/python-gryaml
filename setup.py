@@ -12,7 +12,8 @@ The full documentation is at http://gryaml.rtfd.org."""
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 tests_require = [
-    'pytest'
+    'pytest',
+    'pytest-forked',
 ]
 
 setup(
