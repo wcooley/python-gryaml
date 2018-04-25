@@ -50,7 +50,10 @@ docs/_build
 .testmondata
 
 # pytest cache
-.cache
+.*cache
+
+# pyenv local
+.python-version
 
 # Editor/OS
 *~
@@ -59,3 +62,6 @@ docs/_build
 
 # JUnit-compatible test reports
 junit-*.xml
+
+# Local env
+.env
