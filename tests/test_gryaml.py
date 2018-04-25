@@ -39,9 +39,9 @@ def test_node_parameter_permutations(graphdb):
     """Test node representation."""
     result = yaml.load(open('tests/samples/node-parameter-permutations.yaml'))
     assert len(result) == 3
-    result = graphdb.cypher.execute('MATCH (n) RETURN n')
+    result = match_all_nodes(graphdb)
     assert len(result) == 3  # All nodes
-    result = graphdb.cypher.execute('MATCH (n)-[r]-(o) RETURN *')
+    result = match_all_nodes_and_rels(graphdb)
     assert len(result) == 0  # No relationships
     result = graphdb.cypher.execute('MATCH (n:person) RETURN n')
     assert len(result) == 2  # 2 nodes with `person` label
@@ -72,9 +72,9 @@ def test_relationship_structures(graphdb):
     """Test relationship representation."""
     result = yaml.load(open('tests/samples/relationships.yaml'))
     assert len(result) == 5
-    result = graphdb.cypher.execute('MATCH (n) RETURN n')
+    result = match_all_nodes(graphdb)
     assert len(result) == 3  # 3 nodes
-    result = graphdb.cypher.execute('MATCH (n)-[r]->(o) RETURN *')
+    result = match_all_nodes_and_rels(graphdb)
     assert len(result) == 2  # 2 relationships
     result = graphdb.cypher.execute('MATCH (p)-[r:DIRECTED]->(m)'
                                     ' RETURN p,r,m')
@@ -107,6 +107,8 @@ def test_complex_related_graph(graphdb):
     assert_lana_directed_matrix(result)
 
 
+# Test helpers
+
 def assert_lana_directed_matrix(result):
     """Assert given relationship & nodes."""
     assert len(result) == 1
@@ -114,3 +116,19 @@ def assert_lana_directed_matrix(result):
     assert person['name'] == 'Lana Wachowski'
     assert relationship.type == 'DIRECTED'
     assert movie['title'] == 'The Matrix'
+
+
+def match_all_nodes(graphdb):
+    """Query for all nodes."""
+    return list(graphdb.cypher.execute('MATCH (n) RETURN n'))
+
+
+def match_all_nodes_and_rels(graphdb):
+    """Query for all nodes and relationships."""
+    return list(graphdb.cypher.execute('MATCH (n1)-[r]->(n2)'
+                                       ' RETURN n1, r, n2'))
+
+
+def match_all_rels(graphdb):
+    """Query for all relationships."""
+    return list(graphdb.cypher.execute('MATCH ()-[r]->() RETURN r'))
