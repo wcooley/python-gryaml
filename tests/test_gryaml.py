@@ -1,6 +1,7 @@
 """Tests for `gryaml` module."""
 from __future__ import print_function
 
+from textwrap import dedent
 
 import pytest
 import yaml
@@ -8,8 +9,16 @@ from boltons.iterutils import first
 
 import gryaml
 import py2neo_compat
+from py2neo_compat import (
+    foremost,
+    Graph,
+    Node,
+    node,
+    rel,
+    Relationship,
+)  # noqa: F401
+
 py2neo_compat.monkey_patch_py2neo()
-from py2neo_compat import Node, Relationship
 
 
 @pytest.mark.usefixtures('graphdb_offline')
@@ -106,6 +115,189 @@ def test_complex_related_graph(graphdb):
         RETURN p,r,m
         """)
     assert_lana_directed_matrix(result)
+
+
+@pytest.fixture
+def sample_simple_rel():
+    # type: () -> Relationship
+    """Produce a sample relationship."""
+    # Awkward underscore avoids even more awkward quoting.
+    return rel(node({'name': 'Babs_Jensen'}),
+               'CHARACTER_IN',
+               node({'name': 'Animal_House'}))
+
+
+@pytest.mark.unit
+def test_node_can_be_dumped(sample_simple_rel):
+    # type: (Relationship) -> None
+    """Test dump/represent Node."""
+    sample_node = sample_simple_rel.start_node
+    node_yaml = yaml.dump(sample_node, canonical=True)
+
+    # import sys; print("\n---\n", node_yaml, file=sys.stderr)
+    node_yaml = node_yaml.replace('!!python/unicode', '!!str')
+
+    assert dedent("""
+        ---
+        !gryaml.node [
+          !!map {
+            ? !!str "properties"
+            : !!map {
+              ? !!str "name"
+              : !!str "Babs_Jensen",
+            },
+          },
+        ] """).strip() == node_yaml.strip()
+
+
+@pytest.mark.unit
+def test_node_subclass_can_be_dumped(sample_simple_rel):
+    # type: (Relationship) -> None
+    """Test dump/represent Node."""
+    class MyNode(py2neo_compat.Node):
+        @classmethod
+        def new(cls, **kwargs):
+            """Construct an abstract/unbound MyNode, properties only."""
+            if py2neo_compat.py2neo_ver == 1:
+                inst = cls(None)
+                inst.set_properties(kwargs)
+                return inst
+            else:
+                return cls(**kwargs)
+
+    sample_node = MyNode.new(name='Babs_Jensen')
+    node_yaml = yaml.dump(sample_node, canonical=True)
+
+    node_yaml = node_yaml.replace('!!python/unicode', '!!str')
+    # import sys; print("\n---\n", node_yaml, file=sys.stderr)
+
+    assert dedent("""
+        ---
+        !gryaml.node [
+          !!map {
+            ? !!str "properties"
+            : !!map {
+              ? !!str "name"
+              : !!str "Babs_Jensen",
+            },
+          },
+        ] """).strip() == node_yaml.strip()
+
+
+@pytest.mark.integration
+def test_node_can_be_dumped_then_loaded(graphdb):
+    # type: (Graph) -> None
+    """Ensure a node can be YAML-dumped and then YAML-loaded."""
+    assert 0 == len(match_all_nodes(graphdb))
+
+    n = yaml.load("""
+        !gryaml.node
+        - labels: [person]
+        - properties: {name: Babs_Jensen}
+    """)
+
+    babs_yaml1 = yaml.dump(n)
+
+    r = match_all_nodes(graphdb)
+    assert 1 == len(r)
+
+    babs_yaml2 = yaml.dump(foremost(foremost(r)))
+
+    assert babs_yaml1 == babs_yaml2
+
+    graphdb.delete_all()
+    assert 0 == len(match_all_nodes(graphdb))
+
+    yaml.load(babs_yaml2)
+
+    r = match_all_nodes(graphdb)
+    assert 1 == len(r)
+
+    babs_yaml3 = yaml.dump(foremost(foremost(r)))
+
+    assert babs_yaml2 == babs_yaml3
+
+
+@pytest.mark.unit
+def test_rel_can_be_dumped(sample_simple_rel):
+    # type: (Relationship) -> None
+    """Ensure a relationship and nodes can be dumped."""
+    rel_yaml = yaml.dump(sample_simple_rel, canonical=True)  # type: str
+
+    # import sys; print("\n---\n",rel_yaml, "\n---\n", file=sys.stderr)
+
+    # Py2.7 w/py2neo2 ends up with a unicode tag and quoted "name",
+    # so manually rip those out to avoid having to use a regex
+    rel_yaml = rel_yaml.replace('!!python/unicode', '!!str')
+
+    assert dedent("""
+        ---
+        !gryaml.rel [
+          !gryaml.node [
+            !!map {
+              ? !!str "properties"
+              : !!map {
+                ? !!str "name"
+                : !!str "Babs_Jensen",
+              },
+            },
+          ],
+          !!str "CHARACTER_IN",
+          !gryaml.node [
+            !!map {
+              ? !!str "properties"
+              : !!map {
+                ? !!str "name"
+                : !!str "Animal_House",
+              },
+            },
+          ],
+        ]
+    """).strip() == rel_yaml.strip()
+
+
+@pytest.mark.integration
+def test_rel_can_be_dumped_then_loaded(graphdb):
+    # type: (Graph) -> None
+    """Ensure a relationship and nodes can be dumped and loaded."""
+    assert 0 == len(match_all_nodes_and_rels(graphdb))
+
+    r = yaml.load("""
+        - !gryaml.rel
+          - !gryaml.node
+            - labels:
+                - person
+            - properties:
+                name: Babs Jensen
+          - CHARACTER_IN
+          - !gryaml.node
+            - labels:
+                - movie
+            - properties:
+                name: Animal House
+    """)
+
+    sample_yaml1 = yaml.dump(r)
+
+    result = match_all_rels(graphdb)
+    assert 1 == len(result)
+
+    sample_yaml2 = yaml.dump(list(foremost(result)))
+
+    assert sample_yaml1 == sample_yaml2
+
+    graphdb.delete_all()
+
+    assert 0 == len(match_all_nodes(graphdb))
+
+    yaml.load(sample_yaml2)
+
+    result = match_all_rels(graphdb)
+    assert 1 == len(result)
+
+    sample_yaml3 = yaml.dump(list(foremost(result)))
+
+    assert sample_yaml2 == sample_yaml3
 
 
 # Test helpers

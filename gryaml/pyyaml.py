@@ -2,7 +2,7 @@
 
 import yaml
 
-from py2neo_compat import Node, Relationship
+from py2neo_compat import Node, Relationship, to_dict
 # from py2neo.cypher.core import Record
 
 from . import node, rel
@@ -14,15 +14,20 @@ rel_tag = u'!gryaml.rel'
 def node_representer(dumper, data):
     # type: (yaml.BaseDumper, Node) -> yaml.SequenceNode
     """Represent a Neo4j node as YAML sequence node."""
-    yaml_data = [
-        {'labels': list(data.labels)},
-        {'properties': dict(data.properties)},
-    ]
+    yaml_data = []
+
+    if data.labels:
+        yaml_data.append({'labels': list(data.labels)})
+
+    properties = to_dict(data)
+    if properties:
+        yaml_data.append({'properties': properties})
+
     return dumper.represent_sequence(node_tag, yaml_data,
                                      flow_style=False)
 
 
-yaml.add_representer(Node, node_representer)
+yaml.add_multi_representer(Node, node_representer)
 
 
 def node_constructor(loader, yaml_node):
@@ -41,12 +46,16 @@ def rel_representer(dumper, data):
         data.start_node,
         data.type,
         data.end_node,
-        {'properties': dict(data.properties)},
     ]
+
+    properties = to_dict(data)
+    if properties:
+        yaml_data.append({'properties': properties})
+
     return dumper.represent_sequence(rel_tag, yaml_data, flow_style=False)
 
 
-yaml.add_representer(Relationship, rel_representer)
+yaml.add_multi_representer(Relationship, rel_representer)
 
 
 def rel_constructor(loader, yaml_node):
