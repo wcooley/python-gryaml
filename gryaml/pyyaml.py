@@ -27,7 +27,7 @@ def node_representer(dumper, data):
                                      flow_style=False)
 
 
-yaml.add_representer(Node, node_representer)
+yaml.add_multi_representer(Node, node_representer)
 
 
 def node_constructor(loader, yaml_node):
@@ -55,7 +55,7 @@ def rel_representer(dumper, data):
     return dumper.represent_sequence(rel_tag, yaml_data, flow_style=False)
 
 
-yaml.add_representer(Relationship, rel_representer)
+yaml.add_multi_representer(Relationship, rel_representer)
 
 
 def rel_constructor(loader, yaml_node):

@@ -150,6 +150,40 @@ def test_node_can_be_dumped(sample_simple_rel):
 
 
 @pytest.mark.unit
+def test_node_subclass_can_be_dumped(sample_simple_rel):
+    # type: (Relationship) -> None
+    """Test dump/represent Node."""
+    class MyNode(py2neo_compat.Node):
+        @classmethod
+        def new(cls, **kwargs):
+            """Construct an abstract/unbound MyNode, properties only."""
+            if py2neo_compat.py2neo_ver == 1:
+                inst = cls(None)
+                inst.set_properties(kwargs)
+                return inst
+            else:
+                return cls(**kwargs)
+
+    sample_node = MyNode.new(name='Babs_Jensen')
+    node_yaml = yaml.dump(sample_node, canonical=True)
+
+    node_yaml = node_yaml.replace('!!python/unicode', '!!str')
+    # import sys; print("\n---\n", node_yaml, file=sys.stderr)
+
+    assert dedent("""
+        ---
+        !gryaml.node [
+          !!map {
+            ? !!str "properties"
+            : !!map {
+              ? !!str "name"
+              : !!str "Babs_Jensen",
+            },
+          },
+        ] """).strip() == node_yaml.strip()
+
+
+@pytest.mark.integration
 def test_rel_can_be_dumped(sample_simple_rel):
     # type: (Relationship) -> None
     """Ensure a relationship and nodes can be dumped."""
