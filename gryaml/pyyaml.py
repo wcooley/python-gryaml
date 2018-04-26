@@ -27,16 +27,10 @@ def node_representer(dumper, data):
                                      flow_style=False)
 
 
-yaml.add_multi_representer(Node, node_representer)
-
-
 def node_constructor(loader, yaml_node):
     # type: (yaml.BaseLoader, yaml.Node) -> Node
     """Construct a Neo4j node from a YAML sequence."""
     return node(*(loader.construct_sequence(yaml_node, deep=True)))
-
-
-yaml.add_constructor(node_tag, node_constructor)
 
 
 def rel_representer(dumper, data):
@@ -55,16 +49,19 @@ def rel_representer(dumper, data):
     return dumper.represent_sequence(rel_tag, yaml_data, flow_style=False)
 
 
-yaml.add_multi_representer(Relationship, rel_representer)
-
-
 def rel_constructor(loader, yaml_node):
     # type: (yaml.BaseLoader, yaml.Node) -> Relationship
     """Construct as Neo4j relationship from a YAML sequence."""
     return rel(*loader.construct_sequence(yaml_node, deep=True))
 
 
-yaml.add_constructor(rel_tag, rel_constructor)
+def register():
+    # type: () -> None
+    """Register representers & constructors for nodes & rels."""
+    yaml.add_multi_representer(Node, node_representer)
+    yaml.add_constructor(node_tag, node_constructor)
+    yaml.add_multi_representer(Relationship, rel_representer)
+    yaml.add_constructor(rel_tag, rel_constructor)
 
 # py2neo and pyyaml have bugs that make this not straightforward:
 # * py2neo assumes that a Record will only be compared to an iterable
