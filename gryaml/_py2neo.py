@@ -4,15 +4,15 @@ from __future__ import absolute_import
 from boltons.iterutils import first
 
 try:
-    from typing import Any, List, Mapping, Optional  # noqa
+    from typing import Any, List, Mapping, Optional  # noqa: F401
 except ImportError:
     """Module :mod:`typing` not required for Py27-compatible type comments."""
 
 import py2neo_compat
 py2neo_compat.monkey_patch_py2neo()
 
-from py2neo_compat import (
-    Graph, Node, Relationship, py2neo_ver, create_node, foremost,
+from py2neo_compat import (  # noqa
+    Graph, Node, Relationship, create_node, foremost,
     rel as py2neo_rel
 )
 
@@ -48,7 +48,7 @@ def is_arg_map(argname, mapping):
     """Determine if p is an "arg map".
 
     I.e., a singleton mapping with key `argname` with the actual
-    parameters/properties as the value:
+    parameters/properties as the value::
 
         { 'properties': {
             'color': 'blue',
@@ -75,7 +75,7 @@ def is_label_map(mapping):
 
 def node(*args):
     # type: (*Mapping[str,Any]) -> Node
-    """PyYAML wrapper constructor for creating nodes.
+    """`PyYAML` wrapper constructor for creating nodes.
 
     This allows the YAML node to have 'labels' and 'properties' instead of
     'args' and 'kwargs', at the expense of having to do a little massaging of
@@ -84,7 +84,7 @@ def node(*args):
 
     >>> import yaml
     >>> result = yaml.load('''
-    !!python/object/apply:gryaml.node2
+        !gryaml.node
         - labels:
             - 'person'
         - properties:
@@ -101,7 +101,7 @@ def node(*args):
 
 
 def resolve_rel_properties(properties=None):
-    # type: (Mapping) -> Mapping
+    # type: (Optional[Mapping[str, str]]) -> Mapping[str, str]
     """Extract properties from rel structure.
 
     This supports the properties of a rel being either an "arg map" with key
@@ -130,7 +130,7 @@ def resolve_rel_properties(properties=None):
 
 
 def rel(head, reltype, tail, properties=None):
-    # type: (Node, str, Node, Mapping) -> Relationship
+    # type: (Node, str, Node, Optional[Mapping[str, str]]) -> Relationship
     """Create relationships."""
     properties = resolve_rel_properties(properties)
     path = py2neo_rel(head, reltype, tail, **properties)
