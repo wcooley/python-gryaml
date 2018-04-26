@@ -7,15 +7,13 @@ from py2neo_compat import Node, Relationship
 
 from . import node, rel
 
-# Future improvement:
-# Custom tags & representers/constructors to make both dump and load work
-#
 node_tag = u'!gryaml.node'
 rel_tag = u'!gryaml.rel'
 
 
 def node_representer(dumper, data):
-    """Represent."""
+    # type: (yaml.BaseDumper, Node) -> yaml.SequenceNode
+    """Represent a Neo4j node as YAML sequence node."""
     yaml_data = [
         {'labels': list(data.labels)},
         {'properties': dict(data.properties)},
@@ -28,7 +26,8 @@ yaml.add_representer(Node, node_representer)
 
 
 def node_constructor(loader, yaml_node):
-    """Construct."""
+    # type: (yaml.BaseLoader, yaml.Node) -> Node
+    """Construct a Neo4j node from a YAML sequence."""
     return node(*(loader.construct_sequence(yaml_node, deep=True)))
 
 
@@ -36,7 +35,8 @@ yaml.add_constructor(node_tag, node_constructor)
 
 
 def rel_representer(dumper, data):
-    """Represent."""
+    # type: (yaml.BaseDumper, Relationship) -> yaml.SequenceNode
+    """Represent a Neo4j relationship as a YAML sequence node."""
     yaml_data = [
         data.start_node,
         data.type,
@@ -50,8 +50,10 @@ yaml.add_representer(Relationship, rel_representer)
 
 
 def rel_constructor(loader, yaml_node):
-    """Construct."""
+    # type: (yaml.BaseLoader, yaml.Node) -> Relationship
+    """Construct as Neo4j relationship from a YAML sequence."""
     return rel(*loader.construct_sequence(yaml_node, deep=True))
+
 
 yaml.add_constructor(rel_tag, rel_constructor)
 

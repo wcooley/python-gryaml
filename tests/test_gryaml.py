@@ -1,6 +1,6 @@
 """Tests for `gryaml` module."""
+from __future__ import print_function
 
-import os
 
 import pytest
 import yaml
@@ -90,9 +90,9 @@ def test_complex_related_graph_offline():
 
     directed_rel = [(r.start_node, r, r.end_node)
                     for r in result
-                    if isinstance(r, Relationship)
-                    and r.type == 'DIRECTED'
-                    and r.end_node['title'] == 'The Matrix']
+                    if isinstance(r, Relationship) and
+                    r.type == 'DIRECTED' and
+                    r.end_node['title'] == 'The Matrix']
     assert_lana_directed_matrix(directed_rel)
 
 
@@ -101,9 +101,10 @@ def test_complex_related_graph(graphdb):
     """Test loading a graph with multiple nodes & relationships."""
     result = yaml.load(open('tests/samples/nodes-and-relationships.yaml'))
     assert len(result) == 21
-    result = graphdb.cypher.execute(
-            """MATCH (p)-[r:DIRECTED]->(m{title:"The Matrix"})
-            RETURN p,r,m""")
+    result = graphdb.cypher.execute("""
+        MATCH (p)-[r:DIRECTED]->(m{title:"The Matrix"})
+        RETURN p,r,m
+        """)
     assert_lana_directed_matrix(result)
 
 

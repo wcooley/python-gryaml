@@ -15,7 +15,9 @@ import yaml
 
 from py2neo_compat import py2neo_ver
 
+
 def pytest_report_header(config, startdir):
+    """Add versions & config info to test output on terminal."""
     lines = []
 
     if 'NEO4J_URI' in os.environ:
@@ -28,6 +30,7 @@ def pytest_report_header(config, startdir):
 
     return lines
 
+
 @pytest.fixture
 def graphdb():
     """Fixture connecting to graphdb."""
@@ -37,7 +40,8 @@ def graphdb():
     graphdb.delete_all()
     return graphdb
 
-@pytest.yield_fixture
+
+@pytest.fixture
 def graphdb_offline():
     """Ensure the database is not connected."""
     if py2neo_ver < 2:
@@ -51,4 +55,3 @@ def graphdb_offline():
     gryaml._py2neo.graphdb = old_graphdb
     if neo4j_uri_env:
         os.environ['NEO4J_URI'] = neo4j_uri_env
-
