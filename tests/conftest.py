@@ -35,7 +35,7 @@ def pytest_report_header(config, startdir):
 def graphdb():
     """Fixture connecting to graphdb."""
     if 'NEO4J_URI' not in os.environ:
-        pytest.skip('Need NEO4J_URI environment variable set')
+        os.environ['NEO4J_URI'] = 'http://localhost:7474/db/data'
     graphdb = gryaml.connect(uri=os.environ['NEO4J_URI'])
     graphdb.delete_all()
     return graphdb
