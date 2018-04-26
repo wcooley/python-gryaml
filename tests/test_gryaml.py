@@ -10,6 +10,7 @@ from boltons.iterutils import first
 import gryaml
 import py2neo_compat
 from py2neo_compat import (
+    foremost,
     Graph,
     Node,
     node,
@@ -184,6 +185,40 @@ def test_node_subclass_can_be_dumped(sample_simple_rel):
 
 
 @pytest.mark.integration
+def test_node_can_be_dumped_then_loaded(graphdb):
+    # type: (Graph) -> None
+    """Ensure a node can be YAML-dumped and then YAML-loaded."""
+    assert 0 == len(match_all_nodes(graphdb))
+
+    n = yaml.load("""
+        !gryaml.node
+        - labels: [person]
+        - properties: {name: Babs_Jensen}
+    """)
+
+    babs_yaml1 = yaml.dump(n)
+
+    r = match_all_nodes(graphdb)
+    assert 1 == len(r)
+
+    babs_yaml2 = yaml.dump(foremost(foremost(r)))
+
+    assert babs_yaml1 == babs_yaml2
+
+    graphdb.delete_all()
+    assert 0 == len(match_all_nodes(graphdb))
+
+    yaml.load(babs_yaml2)
+
+    r = match_all_nodes(graphdb)
+    assert 1 == len(r)
+
+    babs_yaml3 = yaml.dump(foremost(foremost(r)))
+
+    assert babs_yaml2 == babs_yaml3
+
+
+@pytest.mark.unit
 def test_rel_can_be_dumped(sample_simple_rel):
     # type: (Relationship) -> None
     """Ensure a relationship and nodes can be dumped."""
@@ -219,6 +254,50 @@ def test_rel_can_be_dumped(sample_simple_rel):
           ],
         ]
     """).strip() == rel_yaml.strip()
+
+
+@pytest.mark.integration
+def test_rel_can_be_dumped_then_loaded(graphdb):
+    # type: (Graph) -> None
+    """Ensure a relationship and nodes can be dumped and loaded."""
+    assert 0 == len(match_all_nodes_and_rels(graphdb))
+
+    r = yaml.load("""
+        - !gryaml.rel
+          - !gryaml.node
+            - labels:
+                - person
+            - properties:
+                name: Babs Jensen
+          - CHARACTER_IN
+          - !gryaml.node
+            - labels:
+                - movie
+            - properties:
+                name: Animal House
+    """)
+
+    sample_yaml1 = yaml.dump(r)
+
+    result = match_all_rels(graphdb)
+    assert 1 == len(result)
+
+    sample_yaml2 = yaml.dump(list(foremost(result)))
+
+    assert sample_yaml1 == sample_yaml2
+
+    graphdb.delete_all()
+
+    assert 0 == len(match_all_nodes(graphdb))
+
+    yaml.load(sample_yaml2)
+
+    result = match_all_rels(graphdb)
+    assert 1 == len(result)
+
+    sample_yaml3 = yaml.dump(list(foremost(result)))
+
+    assert sample_yaml2 == sample_yaml3
 
 
 # Test helpers
