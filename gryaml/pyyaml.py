@@ -14,9 +14,10 @@ rel_tag = u'!gryaml.rel'
 def node_representer(dumper, data):
     # type: (yaml.BaseDumper, Node) -> yaml.SequenceNode
     """Represent a Neo4j node as YAML sequence node."""
-    yaml_data = [
-        {'labels': list(data.labels)},
-    ]
+    yaml_data = []
+
+    if data.labels:
+        yaml_data.append({'labels': list(data.labels)})
 
     properties = to_dict(data)
     if properties:
