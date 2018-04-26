@@ -1,6 +1,7 @@
 """Tests for `gryaml` module."""
 from __future__ import print_function
 
+from textwrap import dedent
 
 import pytest
 import yaml
@@ -8,8 +9,15 @@ from boltons.iterutils import first
 
 import gryaml
 import py2neo_compat
+from py2neo_compat import (
+    Graph,
+    Node,
+    node,
+    rel,
+    Relationship,
+)  # noqa: F401
+
 py2neo_compat.monkey_patch_py2neo()
-from py2neo_compat import Node, Relationship
 
 
 @pytest.mark.usefixtures('graphdb_offline')
@@ -106,6 +114,77 @@ def test_complex_related_graph(graphdb):
         RETURN p,r,m
         """)
     assert_lana_directed_matrix(result)
+
+
+@pytest.fixture
+def sample_simple_rel():
+    # type: () -> Relationship
+    """Produce a sample relationship."""
+    # Awkward underscore avoids even more awkward quoting.
+    return rel(node({'name': 'Babs_Jensen'}),
+               'CHARACTER_IN',
+               node({'name': 'Animal_House'}))
+
+
+@pytest.mark.unit
+def test_node_can_be_dumped(sample_simple_rel):
+    # type: (Relationship) -> None
+    """Test dump/represent Node."""
+    sample_node = sample_simple_rel.start_node
+    node_yaml = yaml.dump(sample_node, canonical=True)
+
+    # import sys; print("\n---\n", node_yaml, file=sys.stderr)
+    node_yaml = node_yaml.replace('!!python/unicode', '!!str')
+
+    assert dedent("""
+        ---
+        !gryaml.node [
+          !!map {
+            ? !!str "properties"
+            : !!map {
+              ? !!str "name"
+              : !!str "Babs_Jensen",
+            },
+          },
+        ] """).strip() == node_yaml.strip()
+
+
+@pytest.mark.unit
+def test_rel_can_be_dumped(sample_simple_rel):
+    # type: (Relationship) -> None
+    """Ensure a relationship and nodes can be dumped."""
+    rel_yaml = yaml.dump(sample_simple_rel, canonical=True)  # type: str
+
+    # import sys; print("\n---\n",rel_yaml, "\n---\n", file=sys.stderr)
+
+    # Py2.7 w/py2neo2 ends up with a unicode tag and quoted "name",
+    # so manually rip those out to avoid having to use a regex
+    rel_yaml = rel_yaml.replace('!!python/unicode', '!!str')
+
+    assert dedent("""
+        ---
+        !gryaml.rel [
+          !gryaml.node [
+            !!map {
+              ? !!str "properties"
+              : !!map {
+                ? !!str "name"
+                : !!str "Babs_Jensen",
+              },
+            },
+          ],
+          !!str "CHARACTER_IN",
+          !gryaml.node [
+            !!map {
+              ? !!str "properties"
+              : !!map {
+                ? !!str "name"
+                : !!str "Animal_House",
+              },
+            },
+          ],
+        ]
+    """).strip() == rel_yaml.strip()
 
 
 # Test helpers
