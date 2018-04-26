@@ -12,6 +12,7 @@ except ImportError:
     """Module :mod:`typing` not required for Py27-compatible type comments."""
 
 import gryaml
+gryaml.register()
 
 
 def parse_args(args=None):

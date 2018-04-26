@@ -19,6 +19,7 @@ from py2neo_compat import (
 )  # noqa: F401
 
 py2neo_compat.monkey_patch_py2neo()
+gryaml.register()
 
 
 @pytest.mark.usefixtures('graphdb_offline')
