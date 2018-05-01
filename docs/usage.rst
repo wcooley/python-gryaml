@@ -4,8 +4,8 @@ Usage
 
 
 Nodes & relationships can be created automatically in a Neo4j database upon
-load using the ``!!python/object/apply`` YAML
-`tag <http://pyyaml.org/wiki/PyYAMLDocumentation#Objects>`_ with PyYAML.
+load using ``!gryaml.node`` or ``!gryaml.rel`` YAML
+`local tag <http://yaml.org/spec/1.1/#local%20tag/>`_.
 
 #. A connection to the graph database needs to be established using
    ``gryaml.connect(uri=URI)`` or ``gryaml.connect(graph=py2neo.Graph(...))``.
@@ -18,23 +18,25 @@ load using the ``!!python/object/apply`` YAML
 
        gryaml.connect('http://localhost:7474')
 
-#. Import :mod:`pyyaml` and load the data:
+#. Register the constructors/representers::
 
-   ::
+        gryaml.register()
+
+#. Import :mod:`pyyaml` and load the data::
 
         import yaml
         yaml.load("""
-        - &node-foo !!python/object/apply:gryaml.node
+        - &node-foo !gryaml.node
           - labels:
             - 'Fooer'
           - properties:
             prop1: 'flim'
-        - &node-bar !!python/object/apply:gryaml.node
+        - &node-bar !gryaml.node
           - labels:
             - 'Barer'
           - properties:
             prop1: 'flam'
-        - !!python/object/apply:gryaml.rel
+        - !gryaml.rel
           - *node-foo
           - 'RELATES_TO'
           - *node-bar
@@ -43,9 +45,7 @@ load using the ``!!python/object/apply`` YAML
         """)
 
 
-   The ``&node-x`` are YAML
-   `anchors <http://pyyaml.org/wiki/PyYAMLDocumentation#Aliases>`_ and
-   ``*node-x`` are YAML
-   `aliases <http://pyyaml.org/wiki/PyYAMLDocumentation#Aliases>`_.
+   The ``&node-x`` are YAML `anchors <http://yaml.org/spec/1.1/#anchor/syntax>`_
+   and ``*node-x`` are `aliases <http://yaml.org/spec/1.1/#alias/syntax>`_.
 
    See the ``tests/samples`` directory for other data examples.

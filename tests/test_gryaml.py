@@ -24,9 +24,9 @@ gryaml.register()
 
 @pytest.mark.usefixtures('graphdb_offline')
 @pytest.mark.unit
-def test_node_parameter_permutation_offline():
+def test_node_parameter_permutation_offline(sample_yaml):
     """Test nodes offline."""
-    result = yaml.load(open('tests/samples/node-parameter-permutations.yaml'))
+    result = yaml.load(sample_yaml('node-parameter-permutations'))
 
     # All nodes
     assert len(result) == 3
@@ -45,9 +45,9 @@ def test_node_parameter_permutation_offline():
 
 
 @pytest.mark.integration
-def test_node_parameter_permutations(graphdb):
+def test_node_parameter_permutations(graphdb, sample_yaml):
     """Test node representation."""
-    result = yaml.load(open('tests/samples/node-parameter-permutations.yaml'))
+    result = yaml.load(sample_yaml('node-parameter-permutations'))
     assert len(result) == 3
     result = match_all_nodes(graphdb)
     assert len(result) == 3  # All nodes
@@ -62,9 +62,9 @@ def test_node_parameter_permutations(graphdb):
 
 @pytest.mark.usefixtures('graphdb_offline')
 @pytest.mark.unit
-def test_relationship_structures_offline():
+def test_relationship_structures_offline(sample_yaml):
     """Test relationship representations offline."""
-    result = yaml.load(open('tests/samples/relationships.yaml'))
+    result = yaml.load(sample_yaml('relationships'))
     assert len(result) == 5
     nodes = [n for n in result if isinstance(n, Node)]
     assert len(nodes) == 3  # 3 nodes
@@ -78,9 +78,9 @@ def test_relationship_structures_offline():
 
 
 @pytest.mark.integration
-def test_relationship_structures(graphdb):
+def test_relationship_structures(graphdb, sample_yaml):
     """Test relationship representation."""
-    result = yaml.load(open('tests/samples/relationships.yaml'))
+    result = yaml.load(sample_yaml('relationships'))
     assert len(result) == 5
     result = match_all_nodes(graphdb)
     assert len(result) == 3  # 3 nodes
@@ -93,9 +93,9 @@ def test_relationship_structures(graphdb):
 
 @pytest.mark.usefixtures('graphdb_offline')
 @pytest.mark.unit
-def test_complex_related_graph_offline():
+def test_complex_related_graph_offline(sample_yaml):
     """Test graph with multiples nodes & relationships offline."""
-    result = yaml.load(open('tests/samples/nodes-and-relationships.yaml'))
+    result = yaml.load(sample_yaml('nodes-and-relationships'))
     assert len(result) == 21
 
     directed_rel = [(r.start_node, r, r.end_node)
@@ -107,9 +107,9 @@ def test_complex_related_graph_offline():
 
 
 @pytest.mark.integration
-def test_complex_related_graph(graphdb):
+def test_complex_related_graph(graphdb, sample_yaml):
     """Test loading a graph with multiple nodes & relationships."""
-    result = yaml.load(open('tests/samples/nodes-and-relationships.yaml'))
+    result = yaml.load(sample_yaml('nodes-and-relationships'))
     assert len(result) == 21
     result = graphdb.cypher.execute("""
         MATCH (p)-[r:DIRECTED]->(m{title:"The Matrix"})

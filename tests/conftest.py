@@ -7,6 +7,11 @@ from __future__ import print_function, absolute_import
 
 import os
 
+try:
+    from pathlib import Path
+except ImportError:
+    from pathlib2 import Path
+
 import pytest  # noqa
 
 import gryaml
@@ -33,6 +38,7 @@ def pytest_report_header(config, startdir):
 
 @pytest.fixture
 def graphdb():
+    # type: () -> py2neo.Graph
     """Fixture connecting to graphdb."""
     if 'NEO4J_URI' not in os.environ:
         os.environ['NEO4J_URI'] = 'http://localhost:7474/db/data'
@@ -43,6 +49,7 @@ def graphdb():
 
 @pytest.fixture
 def graphdb_offline():
+    # type: () -> None
     """Ensure the database is not connected."""
     if py2neo_ver < 2:
         pytest.skip('Offline not supported in py2neo < 2')
@@ -55,3 +62,30 @@ def graphdb_offline():
     gryaml._py2neo.graphdb = old_graphdb
     if neo4j_uri_env:
         os.environ['NEO4J_URI'] = neo4j_uri_env
+
+
+@pytest.fixture(scope='session')
+def samples_path():
+    # type: () -> Path
+    return Path(__file__).parent / 'samples'
+
+@pytest.fixture(scope='session')
+def sample_file(samples_path):
+    # type: (Path) -> Callable[[str], str]
+    def sample_file(fname):
+        # type: (str) -> str
+        fname = samples_path / fname
+        with fname.open() as f:
+            return f.read()
+    return sample_file
+
+@pytest.fixture(scope='session')
+def sample_yaml(sample_file):
+    # type: (Callable[[str], str]) -> Callable[[str], str]
+    def sample_yaml(fname):
+        # type: (str) -> str
+        if not (fname.endswith('.yaml') or fname.endswith('.yml')):
+            fname += '.yaml'
+        return sample_file(fname)
+    return sample_yaml
+

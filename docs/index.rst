@@ -20,8 +20,8 @@ Contents:
 Feedback
 ========
 
-If you have any suggestions or questions about **Python Gryaml** feel free to email me
+If you have any suggestions or questions about **Gryaml** feel free to email me
 at wcooley@nakedape.cc.
 
-If you encounter any errors or problems with **Python Gryaml**, please let me know!
+If you encounter any errors or problems with **Gryaml**, please let me know!
 Open an Issue at the GitHub http://github.com/wcooley/python-gryaml main repository.
