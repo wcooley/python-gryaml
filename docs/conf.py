@@ -49,8 +49,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Python Gryaml'
-copyright = u'2015, Wil Cooley'
+project = u'Gryaml'
+copyright = u'2018, Wil Cooley'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -195,7 +195,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'gryaml.tex', u'Python Gryaml Documentation',
+  ('index', 'gryaml.tex', u'Gryaml Documentation',
    u'Wil Cooley', 'manual'),
 ]
 
@@ -225,7 +225,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'gryaml', u'Python Gryaml Documentation',
+    ('index', 'gryaml', u'Gryaml Documentation',
      [u'Wil Cooley'], 1)
 ]
 
@@ -239,7 +239,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'gryaml', u'Python Gryaml Documentation',
+  ('index', 'gryaml', u'Gryaml Documentation',
    u'Wil Cooley', 'gryaml', 'One line description of project.',
    'Miscellaneous'),
 ]
