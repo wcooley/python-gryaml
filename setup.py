@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Setuptools setup."""
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 readme = open('README.rst').read()
 doclink = """
@@ -27,10 +27,8 @@ setup(
     author='Wil Cooley',
     author_email='wcooley@nakedape.cc',
     url='https://github.com/wcooley/python-gryaml',
-    packages=[
-        'gryaml',
-    ],
-    package_dir={'gryaml': 'gryaml'},
+    packages=find_packages(where='src', include=['gryaml']),
+    package_dir={'': 'src'},
     include_package_data=True,
     install_requires=[
         'boltons',
