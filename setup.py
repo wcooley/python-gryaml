@@ -50,7 +50,7 @@ setup(
     },
     license='MIT',
     zip_safe=False,
-    keywords='gryaml',
+    keywords='yaml py2neo neo4j gryaml',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
