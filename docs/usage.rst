@@ -18,9 +18,11 @@ load using ``!gryaml.node`` or ``!gryaml.rel`` YAML
 
        gryaml.connect('http://localhost:7474')
 
-#. Import :mod:`pyyaml` and load the data:
+#. Register the constructors/representers::
 
-   ::
+        gryaml.register()
+
+#. Import :mod:`pyyaml` and load the data::
 
         import yaml
         yaml.load("""
