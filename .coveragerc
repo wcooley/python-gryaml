@@ -1,0 +1,17 @@
+[run]
+branch = True
+source = gryaml
+
+[paths]
+source =
+    gryaml
+    */lib/python*/site-packages/gryaml
+
+[report]
+exclude_lines =
+    pragma: no cover
+    py2neo_ver == 3
+    py2neo_v3
+
+[html]
+directory = coverage

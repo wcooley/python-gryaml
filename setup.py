@@ -12,7 +12,9 @@ The full documentation is at http://gryaml.rtfd.org."""
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 tests_require = [
+    'coverage',
     'pytest',
+    'pytest-cov',
     'pytest-forked',
     'pathlib2; python_version<"3"',
 ]
