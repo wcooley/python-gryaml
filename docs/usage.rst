@@ -26,17 +26,17 @@ load using ``!gryaml.node`` or ``!gryaml.rel`` YAML
 
         import yaml
         yaml.load("""
-        - &node-foo !!python/object/apply:gryaml.node
+        - &node-foo !gryaml.node
           - labels:
             - 'Fooer'
           - properties:
             prop1: 'flim'
-        - &node-bar !!python/object/apply:gryaml.node
+        - &node-bar !gryaml.node
           - labels:
             - 'Barer'
           - properties:
             prop1: 'flam'
-        - !!python/object/apply:gryaml.rel
+        - !gryaml.rel
           - *node-foo
           - 'RELATES_TO'
           - *node-bar
