@@ -38,6 +38,7 @@ def pytest_report_header(config, startdir):
 
 @pytest.fixture
 def graphdb():
+    # type: () -> py2neo.Graph
     """Fixture connecting to graphdb."""
     if 'NEO4J_URI' not in os.environ:
         os.environ['NEO4J_URI'] = 'http://localhost:7474/db/data'
@@ -48,6 +49,7 @@ def graphdb():
 
 @pytest.fixture
 def graphdb_offline():
+    # type: () -> None
     """Ensure the database is not connected."""
     if py2neo_ver < 2:
         pytest.skip('Offline not supported in py2neo < 2')
