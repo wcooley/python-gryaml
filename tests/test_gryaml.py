@@ -41,19 +41,19 @@ def test_node_parameter_permutation_offline(sample_yaml):
     result = yaml.load(sample_yaml('node-parameter-permutations'))
 
     # All nodes
-    assert len(result) == 3
+    assert 3 == len(result)
 
     # No relationships
-    assert {type(n) for n in result} == {type(Node())}
+    assert {type(Node())} == {type(n) for n in result}
 
     # 2 nodes with 'person' label
-    assert len([n for n in result if n.labels]) == 2
-    assert set(first(n.labels) for n in result if n.labels) == {'person'}
+    assert 2 == len([n for n in result if n.labels])
+    assert {'person'} == set(first(n.labels) for n in result if n.labels)
 
     # 2 nodes with `occupation` property
     occupations = [n['occupation'] for n in result if n['occupation']]
-    assert len(occupations) == 2
-    assert set(occupations) == {'Comedian', 'Game Show Host'}
+    assert 2 == len(occupations)
+    assert {'Comedian', 'Game Show Host'} == set(occupations)
 
 
 @pytest.mark.integration
@@ -63,16 +63,16 @@ def test_node_parameter_permutations(graphdb, sample_yaml):
     gryaml.register()
 
     result = yaml.load(sample_yaml('node-parameter-permutations'))
-    assert len(result) == 3
+    assert 3 == len(result)
     result = match_all_nodes(graphdb)
-    assert len(result) == 3  # All nodes
+    assert 3 == len(result)  # All nodes
     result = match_all_nodes_and_rels(graphdb)
-    assert len(result) == 0  # No relationships
+    assert 0 == len(result)  # No relationships
     result = graphdb.cypher.execute('MATCH (n:person) RETURN n')
-    assert len(result) == 2  # 2 nodes with `person` label
+    assert 2 == len(result)  # 2 nodes with `person` label
     result = graphdb.cypher.execute('MATCH (n) WHERE exists(n.occupation)'
                                     ' RETURN n')
-    assert len(result) == 2  # 2 nodes with `occupation` property
+    assert 2 == len(result)  # 2 nodes with `occupation` property
 
 
 @pytest.mark.usefixtures('graphdb_offline')
@@ -83,11 +83,11 @@ def test_relationship_structures_offline(sample_yaml):
     gryaml.register()
 
     result = yaml.load(sample_yaml('relationships'))
-    assert len(result) == 5
+    assert 5 == len(result)
     nodes = [n for n in result if isinstance(n, Node)]
-    assert len(nodes) == 3  # 3 nodes
+    assert 3 == len(nodes)  # 3 nodes
     rels = [r for r in result if isinstance(r, Relationship)]
-    assert len(rels) == 2  # 2 relationships
+    assert 2 == len(rels)  # 2 relationships
 
     directed_rel = [(r.start_node, r, r.end_node)
                     for r in result
@@ -102,11 +102,11 @@ def test_relationship_structures(graphdb, sample_yaml):
     gryaml.register()
 
     result = yaml.load(sample_yaml('relationships'))
-    assert len(result) == 5
+    assert 5 == len(result)
     result = match_all_nodes(graphdb)
-    assert len(result) == 3  # 3 nodes
+    assert 3 == len(result)  # 3 nodes
     result = match_all_nodes_and_rels(graphdb)
-    assert len(result) == 2  # 2 relationships
+    assert 2 == len(result)  # 2 relationships
     result = graphdb.cypher.execute('MATCH (p)-[r:DIRECTED]->(m)'
                                     ' RETURN p,r,m')
     assert_lana_directed_matrix(result)
@@ -120,7 +120,7 @@ def test_complex_related_graph_offline(sample_yaml):
     gryaml.register()
 
     result = yaml.load(sample_yaml('nodes-and-relationships'))
-    assert len(result) == 21
+    assert 21 == len(result)
 
     directed_rel = [(r.start_node, r, r.end_node)
                     for r in result
@@ -137,7 +137,7 @@ def test_complex_related_graph(graphdb, sample_yaml):
     gryaml.register()
 
     result = yaml.load(sample_yaml('nodes-and-relationships'))
-    assert len(result) == 21
+    assert 21 == len(result)
     result = graphdb.cypher.execute("""
         MATCH (p)-[r:DIRECTED]->(m{title:"The Matrix"})
         RETURN p,r,m
@@ -460,11 +460,11 @@ def test_rel_can_be_dumped_then_loaded(graphdb):
 def assert_lana_directed_matrix(result):
     # type: (List[Union[Node, Relationship]]) -> None
     """Assert given relationship & nodes."""
-    assert len(result) == 1
+    assert 1 == len(result)
     person, relationship, movie = first(result)
-    assert person['name'] == 'Lana Wachowski'
-    assert relationship.type == 'DIRECTED'
-    assert movie['title'] == 'The Matrix'
+    assert 'Lana Wachowski' == person['name']
+    assert 'DIRECTED' == relationship.type
+    assert 'The Matrix' == movie['title']
 
 
 def match_all_nodes(graphdb):
