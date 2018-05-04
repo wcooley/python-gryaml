@@ -9,6 +9,8 @@ from boltons.iterutils import first
 
 import gryaml
 import py2neo_compat
+# noinspection PyProtectedMember
+from gryaml.pyyaml import _unregister as gryaml_unregister
 from py2neo_compat import (
     foremost,
     Graph,
@@ -19,13 +21,20 @@ from py2neo_compat import (
 )  # noqa: F401
 
 py2neo_compat.monkey_patch_py2neo()
-gryaml.register()
+
+
+@pytest.fixture(autouse=True)
+def unregister_gryaml():
+    """Ensure every test explicitly registers."""
+    gryaml_unregister()
 
 
 @pytest.mark.usefixtures('graphdb_offline')
 @pytest.mark.unit
 def test_node_parameter_permutation_offline(sample_yaml):
     """Test nodes offline."""
+    gryaml.register()
+
     result = yaml.load(sample_yaml('node-parameter-permutations'))
 
     # All nodes
@@ -47,6 +56,8 @@ def test_node_parameter_permutation_offline(sample_yaml):
 @pytest.mark.integration
 def test_node_parameter_permutations(graphdb, sample_yaml):
     """Test node representation."""
+    gryaml.register()
+
     result = yaml.load(sample_yaml('node-parameter-permutations'))
     assert len(result) == 3
     result = match_all_nodes(graphdb)
@@ -64,6 +75,8 @@ def test_node_parameter_permutations(graphdb, sample_yaml):
 @pytest.mark.unit
 def test_relationship_structures_offline(sample_yaml):
     """Test relationship representations offline."""
+    gryaml.register()
+
     result = yaml.load(sample_yaml('relationships'))
     assert len(result) == 5
     nodes = [n for n in result if isinstance(n, Node)]
@@ -80,6 +93,8 @@ def test_relationship_structures_offline(sample_yaml):
 @pytest.mark.integration
 def test_relationship_structures(graphdb, sample_yaml):
     """Test relationship representation."""
+    gryaml.register()
+
     result = yaml.load(sample_yaml('relationships'))
     assert len(result) == 5
     result = match_all_nodes(graphdb)
@@ -95,6 +110,8 @@ def test_relationship_structures(graphdb, sample_yaml):
 @pytest.mark.unit
 def test_complex_related_graph_offline(sample_yaml):
     """Test graph with multiples nodes & relationships offline."""
+    gryaml.register()
+
     result = yaml.load(sample_yaml('nodes-and-relationships'))
     assert len(result) == 21
 
@@ -109,6 +126,8 @@ def test_complex_related_graph_offline(sample_yaml):
 @pytest.mark.integration
 def test_complex_related_graph(graphdb, sample_yaml):
     """Test loading a graph with multiple nodes & relationships."""
+    gryaml.register()
+
     result = yaml.load(sample_yaml('nodes-and-relationships'))
     assert len(result) == 21
     result = graphdb.cypher.execute("""
@@ -132,6 +151,8 @@ def sample_simple_rel():
 def test_node_can_be_dumped(sample_simple_rel):
     # type: (Relationship) -> None
     """Test dump/represent Node."""
+    gryaml.register()
+
     sample_node = sample_simple_rel.start_node
     node_yaml = yaml.dump(sample_node, canonical=True)
 
@@ -155,6 +176,8 @@ def test_node_can_be_dumped(sample_simple_rel):
 def test_node_subclass_can_be_dumped(sample_simple_rel):
     # type: (Relationship) -> None
     """Test dump/represent Node."""
+    gryaml.register()
+
     class MyNode(py2neo_compat.Node):
         @classmethod
         def new(cls, **kwargs):
@@ -189,6 +212,8 @@ def test_node_subclass_can_be_dumped(sample_simple_rel):
 def test_node_can_be_dumped_then_loaded(graphdb):
     # type: (Graph) -> None
     """Ensure a node can be YAML-dumped and then YAML-loaded."""
+    gryaml.register()
+
     assert 0 == len(match_all_nodes(graphdb))
 
     n = yaml.load("""
@@ -223,6 +248,8 @@ def test_node_can_be_dumped_then_loaded(graphdb):
 def test_rel_can_be_dumped(sample_simple_rel):
     # type: (Relationship) -> None
     """Ensure a relationship and nodes can be dumped."""
+    gryaml.register()
+
     rel_yaml = yaml.dump(sample_simple_rel, canonical=True)  # type: str
 
     # import sys; print("\n---\n",rel_yaml, "\n---\n", file=sys.stderr)
@@ -261,6 +288,8 @@ def test_rel_can_be_dumped(sample_simple_rel):
 def test_rel_can_be_dumped_then_loaded(graphdb):
     # type: (Graph) -> None
     """Ensure a relationship and nodes can be dumped and loaded."""
+    gryaml.register()
+
     assert 0 == len(match_all_nodes_and_rels(graphdb))
 
     r = yaml.load("""

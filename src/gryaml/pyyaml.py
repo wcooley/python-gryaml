@@ -63,6 +63,29 @@ def register():
     yaml.add_multi_representer(Relationship, rel_representer)
     yaml.add_constructor(rel_tag, rel_constructor)
 
+
+def _unregister():
+    # type: () -> None
+    """Attempt to remove registered representers and constructors.
+
+    This should probably only be used in testing, as manipulating the
+    underlying dicts for the dumpers/loaders feels like an encapsulation
+    violation, even though the attributes are not named according to the
+    convention for private attributes. (Otherwise, why would the PyYAML author
+    bother with the ``yaml.add_*`` methods?)
+    """
+
+    for loader in [yaml.BaseLoader, yaml.Loader, yaml.SafeLoader]:
+        for tag in [node_tag, rel_tag]:
+            loader.yaml_constructors.pop(tag, None)
+            loader.yaml_multi_constructors.pop(tag, None)
+
+    for dumper in [yaml.BaseDumper, yaml.Dumper, yaml.SafeDumper]:
+        for cls in [Node, Relationship]:
+            dumper.yaml_representers.pop(cls, None)
+            dumper.yaml_multi_representers.pop(cls, None)
+
+
 # py2neo and pyyaml have bugs that make this not straightforward:
 # * py2neo assumes that a Record will only be compared to an iterable
 # in `Record`'s `__eq__` method; it explicitly converts itself and "other"
