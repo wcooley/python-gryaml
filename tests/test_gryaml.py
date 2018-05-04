@@ -3,6 +3,8 @@ from __future__ import print_function
 
 from textwrap import dedent
 
+from typing import Callable, List, Union
+
 import pytest
 import yaml
 from boltons.iterutils import first
@@ -32,6 +34,7 @@ def unregister_gryaml():
 @pytest.mark.usefixtures('graphdb_offline')
 @pytest.mark.unit
 def test_node_parameter_permutation_offline(sample_yaml):
+    # type: (Callable[[str], str]) -> None
     """Test nodes offline."""
     gryaml.register()
 
@@ -55,6 +58,7 @@ def test_node_parameter_permutation_offline(sample_yaml):
 
 @pytest.mark.integration
 def test_node_parameter_permutations(graphdb, sample_yaml):
+    # type: (Graph, Callable[[str], str]) -> None
     """Test node representation."""
     gryaml.register()
 
@@ -74,6 +78,7 @@ def test_node_parameter_permutations(graphdb, sample_yaml):
 @pytest.mark.usefixtures('graphdb_offline')
 @pytest.mark.unit
 def test_relationship_structures_offline(sample_yaml):
+    # type: (Callable[[str], str]) -> None
     """Test relationship representations offline."""
     gryaml.register()
 
@@ -92,6 +97,7 @@ def test_relationship_structures_offline(sample_yaml):
 
 @pytest.mark.integration
 def test_relationship_structures(graphdb, sample_yaml):
+    # type: (Graph, Callable[[str], str]) -> None
     """Test relationship representation."""
     gryaml.register()
 
@@ -109,6 +115,7 @@ def test_relationship_structures(graphdb, sample_yaml):
 @pytest.mark.usefixtures('graphdb_offline')
 @pytest.mark.unit
 def test_complex_related_graph_offline(sample_yaml):
+    # type: (Callable[[str], str]) -> None
     """Test graph with multiples nodes & relationships offline."""
     gryaml.register()
 
@@ -125,6 +132,7 @@ def test_complex_related_graph_offline(sample_yaml):
 
 @pytest.mark.integration
 def test_complex_related_graph(graphdb, sample_yaml):
+    # type: (Graph, Callable[[str], str]) -> None
     """Test loading a graph with multiple nodes & relationships."""
     gryaml.register()
 
@@ -173,8 +181,8 @@ def test_node_can_be_loaded_and_created(graphdb):
 
 
 @pytest.mark.unit
-def test_node_can_be_loaded_simple(graphdb):
-    # type: (Relationship) -> None
+def test_node_can_be_loaded_simple():
+    # type: () -> None
     """Test loading a single node with "simple" representation.
 
     The "simple" representation should return the same structure that would
@@ -191,8 +199,6 @@ def test_node_can_be_loaded_simple(graphdb):
         """
 
     node_loaded = yaml.safe_load(sample_yaml)
-
-    assert not match_all_nodes(graphdb)
 
     node_data = yaml.load(sample_yaml.replace('!gryaml.node', ''))
     assert node_data == node_loaded
@@ -452,6 +458,7 @@ def test_rel_can_be_dumped_then_loaded(graphdb):
 # Test helpers
 
 def assert_lana_directed_matrix(result):
+    # type: (List[Union[Node, Relationship]]) -> None
     """Assert given relationship & nodes."""
     assert len(result) == 1
     person, relationship, movie = first(result)
@@ -482,7 +489,8 @@ def match_all_rels(graphdb):
 
 
 def test_helpers(graphdb):
-
+    # type: (Graph) -> None
+    """Ensure that test helpers work as expected."""
     r = graphdb.cypher.execute("""
         CREATE (cloudAtlas:Movie { title:"Cloud Atlas",released:2012 })
         CREATE (forrestGump:Movie { title:"Forrest Gump",released:1994 })
