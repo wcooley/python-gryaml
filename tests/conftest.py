@@ -20,6 +20,12 @@ import yaml
 
 from py2neo_compat import py2neo_ver
 
+pytest.mark.skip_py2neo1 = pytest.mark.skipif(py2neo_ver == 1,
+                                              reason='py2neo v1 not supported')
+
+pytest.mark.todo = pytest.mark.xfail(reason='TODO', run=True, strict=True)
+
+
 
 def pytest_report_header(config, startdir):
     """Add versions & config info to test output on terminal."""
