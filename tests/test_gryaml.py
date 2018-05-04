@@ -216,7 +216,6 @@ def test_node_can_be_dumped(sample_simple_rel):
     sample_node = sample_simple_rel.start_node
     node_yaml = yaml.dump(sample_node, canonical=True)
 
-    # import sys; print("\n---\n", node_yaml, file=sys.stderr)
     node_yaml = node_yaml.replace('!!python/unicode', '!!str')
 
     assert dedent("""
@@ -253,7 +252,6 @@ def test_node_subclass_can_be_dumped():
     node_yaml = yaml.dump(sample_node, canonical=True)
 
     node_yaml = node_yaml.replace('!!python/unicode', '!!str')
-    # import sys; print("\n---\n", node_yaml, file=sys.stderr)
 
     assert dedent("""
         ---
@@ -338,8 +336,6 @@ def test_rel_can_be_dumped(sample_simple_rel):
     gryaml.register()
 
     rel_yaml = yaml.dump(sample_simple_rel, canonical=True)  # type: str
-
-    # import sys; print("\n---\n",rel_yaml, "\n---\n", file=sys.stderr)
 
     # Py2.7 w/py2neo2 ends up with a unicode tag and quoted "name",
     # so manually rip those out to avoid having to use a regex
