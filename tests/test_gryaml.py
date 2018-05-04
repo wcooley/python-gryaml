@@ -308,7 +308,7 @@ def test_node_can_be_dumped_then_loaded(graphdb):
     r = match_all_nodes(graphdb)
     assert 1 == len(r)
 
-    babs_yaml2 = yaml.dump(foremost(foremost(r)))
+    babs_yaml2 = yaml.dump(foremost(r))
 
     assert babs_yaml1 == babs_yaml2
 
@@ -320,7 +320,7 @@ def test_node_can_be_dumped_then_loaded(graphdb):
     r = match_all_nodes(graphdb)
     assert 1 == len(r)
 
-    babs_yaml3 = yaml.dump(foremost(foremost(r)))
+    babs_yaml3 = yaml.dump(foremost(r))
 
     assert babs_yaml2 == babs_yaml3
 
@@ -431,7 +431,7 @@ def test_rel_can_be_dumped_then_loaded(graphdb):
     result = match_all_rels(graphdb)
     assert 1 == len(result)
 
-    sample_yaml2 = yaml.dump(list(foremost(result)))
+    sample_yaml2 = yaml.dump(result)
 
     assert sample_yaml1 == sample_yaml2
 
@@ -444,7 +444,7 @@ def test_rel_can_be_dumped_then_loaded(graphdb):
     result = match_all_rels(graphdb)
     assert 1 == len(result)
 
-    sample_yaml3 = yaml.dump(list(foremost(result)))
+    sample_yaml3 = yaml.dump(result)
 
     assert sample_yaml2 == sample_yaml3
 
@@ -461,16 +461,62 @@ def assert_lana_directed_matrix(result):
 
 
 def match_all_nodes(graphdb):
+    # type: (Graph) -> List[Node]
     """Query for all nodes."""
-    return list(graphdb.cypher.execute('MATCH (n) RETURN n'))
+    return [foremost(r) for r in graphdb.cypher.execute('MATCH (n) RETURN n')]
 
 
 def match_all_nodes_and_rels(graphdb):
+    # type: (Graph) -> List[List[Node, Relationship, Node]]
     """Query for all nodes and relationships."""
-    return list(graphdb.cypher.execute('MATCH (n1)-[r]->(n2)'
-                                       ' RETURN n1, r, n2'))
+    return [list(r)
+            for r in graphdb.cypher.execute('MATCH (n1)-[r]->(n2)'
+                                            ' RETURN n1, r, n2')]
 
 
 def match_all_rels(graphdb):
+    # type: (Graph) -> List[Node]
     """Query for all relationships."""
-    return list(graphdb.cypher.execute('MATCH ()-[r]->() RETURN r'))
+    return [foremost(r)
+            for r in graphdb.cypher.execute('MATCH ()-[r]->() RETURN r')]
+
+
+def test_helpers(graphdb):
+
+    r = graphdb.cypher.execute("""
+        CREATE (cloudAtlas:Movie { title:"Cloud Atlas",released:2012 })
+        CREATE (forrestGump:Movie { title:"Forrest Gump",released:1994 })
+        CREATE (robert:Person { name:"Robert Zemeckis", born:1951 })
+        CREATE (tom:Person { name:"Tom Hanks", born:1956 })
+        CREATE (tom)-[r1:ACTED_IN { roles: ["Forrest"]}]->(forrestGump)
+        CREATE (tom)-[r2:ACTED_IN { roles: ['Zachry']}]->(cloudAtlas)
+        CREATE (robert)-[r3:DIRECTED]->(forrestGump)
+        WITH [r1, r2, r3] as rs
+        UNWIND rs as rel
+        RETURN rel
+        """)
+
+    r = list(r)
+    assert 3 == len(r)
+    # assert not r
+
+    all_rels = match_all_rels(graphdb)
+    assert 3 == len(all_rels)
+    for rel_ in all_rels:
+        assert isinstance(rel_, Relationship)
+        assert rel_.type in {'ACTED_IN', 'DIRECTED'}
+
+    all_nodes = match_all_nodes(graphdb)
+    assert 4 == len(all_nodes)
+    for node_ in all_nodes:
+        assert isinstance(node_, Node)
+        assert tuple(node_.labels) in {('Movie',), ('Person',)}
+
+    all_nodes_and_rels = match_all_nodes_and_rels(graphdb)
+    assert 3 == len(all_nodes_and_rels)
+    for start_node, rel_, end_node in all_nodes_and_rels:
+        assert isinstance(start_node, Node)
+        assert isinstance(end_node, Node)
+        assert isinstance(rel_, Relationship)
+        assert start_node == rel_.start_node
+        assert end_node == rel_.end_node
