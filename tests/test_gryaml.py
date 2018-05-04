@@ -147,6 +147,60 @@ def sample_simple_rel():
                node({'name': 'Animal_House'}))
 
 
+@pytest.mark.integration
+def test_node_can_be_loaded_and_created(graphdb):
+    # type: (Relationship) -> None
+    """Test loading a single node, creating in the DB and returning it."""
+    gryaml.register()
+
+    sample_yaml = """
+        !gryaml.node
+          - properties:
+              name: Babs_Jensen
+          - labels:
+            - person
+        """
+
+    node_loaded = yaml.load(sample_yaml)
+    node_found = foremost(match_all_nodes(graphdb))
+
+    assert node_loaded == node_found
+
+    node_data = yaml.load(sample_yaml.replace('!gryaml.node', ''))
+
+    assert node_data[0]['properties'] == py2neo_compat.to_dict(node_loaded)
+    assert node_data[1]['labels'] == list(node_loaded.labels)
+
+
+@pytest.mark.unit
+def test_node_can_be_loaded_simple(graphdb):
+    # type: (Relationship) -> None
+    """Test loading a single node with "simple" representation.
+
+    The "simple" representation should return the same structure that would
+    be created if the '!gryaml.node' tag were absent or the implicit type.
+    """
+    gryaml.register_simple()
+
+    sample_yaml = """
+        !gryaml.node
+          - properties:
+              name: Babs_Jensen
+          - labels:
+            - person
+        """
+
+    node_loaded = yaml.safe_load(sample_yaml)
+
+    assert not match_all_nodes(graphdb)
+
+    node_data = yaml.load(sample_yaml.replace('!gryaml.node', ''))
+    assert node_data == node_loaded
+
+    node_data = yaml.load(sample_yaml.replace('!gryaml.node', '!!seq'))
+    assert node_data == node_loaded
+
+
 @pytest.mark.unit
 def test_node_can_be_dumped(sample_simple_rel):
     # type: (Relationship) -> None
@@ -206,6 +260,33 @@ def test_node_subclass_can_be_dumped(sample_simple_rel):
             },
           },
         ] """).strip() == node_yaml.strip()
+
+
+@pytest.mark.unit
+def test_node_can_be_dumped_simple(sample_simple_rel):
+    # type: (Relationship) -> None
+    """Test dump/represent Node."""
+    gryaml.register_simple()
+    # gryaml.register_simple(safe=False)
+
+    sample_node = sample_simple_rel.start_node
+    node_yaml = yaml.safe_dump(sample_node, canonical=True)
+
+    node_yaml = node_yaml.replace('!!python/unicode', '!!str')
+
+    expected_yaml = dedent("""
+        ---
+        !!seq [
+          !!map {
+            ? !!str "properties"
+            : !!map {
+              ? !!str "name"
+              : !!str "Babs_Jensen",
+            },
+          },
+        ]""").strip()
+
+    assert expected_yaml == node_yaml.strip()
 
 
 @pytest.mark.integration
@@ -272,6 +353,44 @@ def test_rel_can_be_dumped(sample_simple_rel):
           ],
           !!str "CHARACTER_IN",
           !gryaml.node [
+            !!map {
+              ? !!str "properties"
+              : !!map {
+                ? !!str "name"
+                : !!str "Animal_House",
+              },
+            },
+          ],
+        ]
+    """).strip() == rel_yaml.strip()
+
+
+@pytest.mark.unit
+def test_rel_can_be_dumped_simple(sample_simple_rel):
+    # type: (Relationship) -> None
+    """Ensure a relationship and nodes can be dumped."""
+    gryaml.register_simple()
+
+    rel_yaml = yaml.safe_dump(sample_simple_rel, canonical=True)  # type: str
+
+    # Py2.7 w/py2neo2 ends up with a unicode tag and quoted "name",
+    # so manually rip those out to avoid having to use a regex
+    rel_yaml = rel_yaml.replace('!!python/unicode', '!!str')
+
+    assert dedent("""
+        ---
+        !!seq [
+          !!seq [
+            !!map {
+              ? !!str "properties"
+              : !!map {
+                ? !!str "name"
+                : !!str "Babs_Jensen",
+              },
+            },
+          ],
+          !!str "CHARACTER_IN",
+          !!seq [
             !!map {
               ? !!str "properties"
               : !!map {

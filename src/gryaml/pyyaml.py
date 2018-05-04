@@ -48,10 +48,22 @@ def node_representer(dumper, graph_node):
                                      flow_style=False)
 
 
+def node_representer_simple(dumper, graph_node):
+    # type: (yaml.SafeDumper, Node) -> yaml.SequenceNode
+    """Represent a Neo4j node as YAML list."""
+    return dumper.represent_list(render_node(graph_node))
+
+
+def node_constructor_simple(loader, yaml_node):
+    # type: (yaml.SafeLoader, yaml.Node) -> List
+    """Construct "node" with only primitive Python types."""
+    return loader.construct_sequence(yaml_node, deep=True)
+
+
 def node_constructor(loader, yaml_node):
     # type: (yaml.BaseLoader, yaml.Node) -> Node
     """Construct a Neo4j node from a YAML sequence."""
-    return node(*(loader.construct_sequence(yaml_node, deep=True)))
+    return node(*node_constructor_simple(loader, yaml_node))
 
 
 def render_relationship(graph_rel):
@@ -88,10 +100,22 @@ def rel_representer(dumper, graph_rel):
                                      flow_style=False)
 
 
+def rel_representer_simple(dumper, graph_rel):
+    # type: (yaml.SafeDumper, Relationship) -> yaml.SequenceNode
+    """Represent a Neo4j relationship as a YAML sequence. """
+    return dumper.represent_list(render_relationship(graph_rel))
+
+
+def rel_constructor_simple(loader, yaml_node):
+    # type: (yaml.BaseLoader, yaml.Node) -> List
+    """Construct a sequence from a tagged YAML sequence."""
+    return loader.construct_sequence(yaml_node, deep=True)
+
+
 def rel_constructor(loader, yaml_node):
     # type: (yaml.BaseLoader, yaml.Node) -> Relationship
-    """Construct as Neo4j relationship from a YAML sequence."""
-    return rel(*loader.construct_sequence(yaml_node, deep=True))
+    """Construct a Neo4j relationship from a tagged YAML sequence."""
+    return rel(*rel_constructor_simple(loader, yaml_node))
 
 
 def register(safe=False):
@@ -110,6 +134,27 @@ def register(safe=False):
 
     yaml.add_constructor(node_tag, node_constructor, Loader=loader)
     yaml.add_constructor(rel_tag, rel_constructor, Loader=loader)
+
+
+def register_simple(safe=True):
+    # type: () -> None
+    """Register representers & constructors using only native YAML types."""
+
+    if safe:
+        dumper = yaml.SafeDumper
+        loader = yaml.SafeLoader
+    else:
+        dumper = yaml.Dumper
+        loader = yaml.Loader
+
+    yaml.add_multi_representer(Node, node_representer_simple, Dumper=dumper)
+    yaml.add_multi_representer(Relationship, rel_representer_simple,
+                               Dumper=dumper)
+
+    yaml.add_constructor(node_tag, node_constructor_simple, Loader=loader)
+
+    yaml.add_constructor(rel_tag, rel_constructor_simple, Loader=loader)
+
 
 def _unregister():
     # type: () -> None
