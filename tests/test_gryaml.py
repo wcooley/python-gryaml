@@ -227,7 +227,7 @@ def test_node_can_be_dumped(sample_simple_rel):
 
 
 @pytest.mark.unit
-def test_node_subclass_can_be_dumped(sample_simple_rel):
+def test_node_subclass_can_be_dumped():
     # type: (Relationship) -> None
     """Test dump/represent Node."""
     gryaml.register()
