@@ -37,7 +37,7 @@ def pytest_report_header(config, startdir):
     lines.append('py2neo: {0.__version__}'
                  ' pyyaml: {1.__version__}'
                  ' libyaml: {1.__with_libyaml__}'.format(py2neo, yaml))
-    lines.append('forked: %s' % config.getvalue('forked'))
+    lines.append('forked: %s' % config.getoption('forked', default=False))
 
     return lines
 
