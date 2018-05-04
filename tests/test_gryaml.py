@@ -455,6 +455,118 @@ def test_rel_can_be_dumped_then_loaded(graphdb):
     assert sample_yaml2 == sample_yaml3
 
 
+@pytest.mark.skip_py2neo1
+@pytest.mark.todo
+@pytest.mark.integration
+def test_representers(graphdb):
+    # type: (Graph) -> None
+    # gryaml.register_simple()
+    gryaml.register()
+
+    # language=cypher
+    graphdb.cypher.execute("""
+        CREATE (cloudAtlas:Movie { title:"Cloud Atlas",released:2012 })
+        CREATE (forrestGump:Movie { title:"Forrest Gump",released:1994 })
+        CREATE (robert:Person { name:"Robert Zemeckis", born:1951 })
+        CREATE (tom:Person { name:"Tom Hanks", born:1956 })
+        CREATE (tom)-[:ACTED_IN { roles: ["Forrest"]}]->(forrestGump)
+        CREATE (tom)-[:ACTED_IN { roles: ['Zachry']}]->(cloudAtlas)
+        CREATE (robert)-[:DIRECTED]->(forrestGump)""")
+
+    expected = dedent("""
+        - !gryaml.rel
+          - &id001 !gryaml.node
+            - labels: [Person]
+            - properties: {born: 1956, name: Tom Hanks}
+          - ACTED_IN
+          - !gryaml.node
+            - labels: [Movie]
+            - properties: {released: 2012, title: Cloud Atlas}
+          - properties:
+              roles: [Zachry]
+        - !gryaml.rel
+          - *id001
+          - ACTED_IN
+          - &id002 !gryaml.node
+            - labels: [Movie]
+            - properties: {released: 1994, title: Forrest Gump}
+          - properties:
+              roles: [Forrest]
+        - !gryaml.rel
+          - !gryaml.node
+            - labels: [Person]
+            - properties: {born: 1951, name: Robert Zemeckis}
+          - DIRECTED
+          - *id002
+    """).lstrip()
+    all_graph = match_all_rels(graphdb)
+    import sys, pprint; print(pprint.pformat(all_graph), file=sys.stderr)
+    all_graph_yaml = yaml.dump(all_graph, canonical=False).lstrip()
+    # import sys; print(all_graph_yaml, file=sys.stderr)
+    # assert all_graph_yaml == ''
+
+    # This, unfortunately, does not work consistently, due to result ordering
+    # being non-deterministic and anchors/aliases being different:
+    # assert expected == all_graph_yaml
+
+    for s in ['!gryaml.rel', '!gryaml.node', 'labels', 'properties', '\n']:
+        assert expected.count(s) == all_graph_yaml.count(s)
+
+    all_graph_base = yaml.load(all_graph_yaml, Loader=yaml.BaseLoader)
+    expected_base = yaml.load(expected, Loader=yaml.BaseLoader)
+
+    assert expected_base == all_graph_base
+    # what does the base data look like?
+    # assert expected_base == []
+
+
+@pytest.mark.todo
+@pytest.mark.skip_py2neo1
+@pytest.mark.integration
+def test_quoting(graphdb):
+    # type: (Graph) -> None
+    """Test that quoting of labels, types, etc is as expected."""
+    gryaml.register()
+
+    expected_yaml = dedent("""
+        - !gryaml.rel
+          - !gryaml.node
+            - labels: [Also Special Person]
+            - properties: {Real Name: Alice B. Toklas}
+          - IN LOVE WITH
+          - !gryaml.node
+            - labels: [Special Person]
+            - properties: {Pet Name: Gertie}
+        """).lstrip()
+
+    # language=cypher
+    graphdb.cypher.execute("""
+        CREATE (gertie:`Special Person` {`Pet Name`: 'Gertie'})
+        CREATE (alice:`Also Special Person` {`Real Name`: 'Alice B. Toklas'})
+        CREATE (alice)-[ilw:`IN LOVE WITH`]->(gertie) RETURN *;
+    """)
+
+    results = [list(r) for r in graphdb.match()]
+    yaml_serial = yaml.dump(results, canonical=True)
+    yaml_serial = yaml_serial.lstrip().replace('!!python/unicode', '!!str')
+    assert expected_yaml == yaml_serial
+
+    graphdb.cypher.execute('MATCH (n) DETACH DELETE n')
+    assert 0 == len(list(graphdb.match()))
+
+    loaded_entities = yaml.load(yaml_serial)
+    queried_entities = [list(r) for r in graphdb.match()]
+
+    assert loaded_entities
+    assert [None] != loaded_entities
+    assert queried_entities
+
+    # assert loaded_entities == queried_entities
+
+    assert expected_yaml == yaml.dump(loaded_entities).lstrip()
+    assert expected_yaml == yaml.dump(queried_entities).lstrip()
+
+
 # Test helpers
 
 def assert_lana_directed_matrix(result):
