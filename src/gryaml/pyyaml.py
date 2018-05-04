@@ -55,14 +55,22 @@ def rel_constructor(loader, yaml_node):
     return rel(*loader.construct_sequence(yaml_node, deep=True))
 
 
-def register():
-    # type: () -> None
+def register(safe=False):
+    # type: (Optional[bool]) -> None
     """Register representers & constructors for nodes & rels."""
-    yaml.add_multi_representer(Node, node_representer)
-    yaml.add_constructor(node_tag, node_constructor)
-    yaml.add_multi_representer(Relationship, rel_representer)
-    yaml.add_constructor(rel_tag, rel_constructor)
 
+    if safe:
+        dumper = yaml.SafeDumper
+        loader = yaml.SafeLoader
+    else:
+        dumper = yaml.Dumper
+        loader = yaml.Loader
+
+    yaml.add_multi_representer(Node, node_representer, Dumper=dumper)
+    yaml.add_multi_representer(Relationship, rel_representer, Dumper=dumper)
+
+    yaml.add_constructor(node_tag, node_constructor, Loader=loader)
+    yaml.add_constructor(rel_tag, rel_constructor, Loader=loader)
 
 def _unregister():
     # type: () -> None
