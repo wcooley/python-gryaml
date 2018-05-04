@@ -1,4 +1,5 @@
-"""Incomplete support for dump/load w/PyYAML."""
+"""Support for dump/load w/PyYAML."""
+from __future__ import absolute_import, print_function
 
 from typing import Dict, List, Optional, Union
 
