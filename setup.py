@@ -9,6 +9,13 @@ with open('README.rst') as fp:
 with open('HISTORY.rst') as fp:
     history = fp.read().replace('.. :changelog:', '')
 
+install_requires = [
+    'boltons',
+    'py2neo<3',
+    'py2neo_compat~=1.0.0pre0',
+    'pyyaml',
+]
+
 tests_require = [
     'pytest',
     'pytest-cov',
@@ -27,12 +34,7 @@ setup(
     packages=find_packages(where='src', include=['gryaml']),
     package_dir={'': 'src'},
     include_package_data=True,
-    install_requires=[
-        'boltons',
-        'py2neo<3',
-        'py2neo_compat~=1.0.0pre0',
-        'pyyaml',
-    ],
+    install_requires=install_requires,
     setup_requires=['setuptools_scm'],
     tests_require=tests_require,
     extras_require={
