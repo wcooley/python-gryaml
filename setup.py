@@ -3,9 +3,11 @@
 
 from setuptools import setup, find_packages
 
-readme = open('README.rst').read()
+with open('README.rst') as fp:
+    readme = fp.read()
 
-history = open('HISTORY.rst').read().replace('.. :changelog:', '')
+with open('HISTORY.rst') as fp:
+    history = fp.read().replace('.. :changelog:', '')
 
 tests_require = [
     'pytest',
