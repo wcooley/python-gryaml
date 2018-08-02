@@ -39,12 +39,6 @@ setup(
     tests_require=tests_require,
     extras_require={
         'test': tests_require,
-        'lint': [
-            'flake8',
-            'flake8-docstrings',
-            'flake8-formatter-junit-xml',
-            'pep8-naming',
-        ],
     },
     license='MIT',
     zip_safe=False,
