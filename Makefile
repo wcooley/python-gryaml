@@ -14,14 +14,16 @@ help:
 clean: clean-build clean-pyc
 
 clean-build:
-	rm -fr build/
-	rm -fr dist/
-	rm -fr *.egg-info
+	- rm -fr build/ 
+	- rm -fr dist/
+	- rm -fr {*/,}*.egg-info
+	- rm junit-*.xml
+	- rm -r coverage/
 
 clean-pyc:
-	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f {} +
+	# Use '*' to not match .tox
+	find */ -name '*.pyc' -o -name '*.pyo' -o -name '*~' -delete
+	find */ -name __pycache__ -type d -empty -print0 | xargs -0 rmdir
 
 lint:
 	flake8 gryaml test
