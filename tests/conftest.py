@@ -20,6 +20,12 @@ import yaml
 
 from py2neo_compat import py2neo_ver
 
+pytest.mark.skip_py2neo1 = pytest.mark.skipif(py2neo_ver == 1,
+                                              reason='py2neo v1 not supported')
+
+pytest.mark.todo = pytest.mark.xfail(reason='TODO', run=True, strict=True)
+
+
 
 def pytest_report_header(config, startdir):
     """Add versions & config info to test output on terminal."""
@@ -31,7 +37,7 @@ def pytest_report_header(config, startdir):
     lines.append('py2neo: {0.__version__}'
                  ' pyyaml: {1.__version__}'
                  ' libyaml: {1.__with_libyaml__}'.format(py2neo, yaml))
-    lines.append('forked: %s' % config.getvalue('forked'))
+    lines.append('forked: %s' % config.getoption('forked', default=False))
 
     return lines
 
