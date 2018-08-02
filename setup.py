@@ -4,11 +4,7 @@
 from setuptools import setup, find_packages
 
 readme = open('README.rst').read()
-doclink = """
-Documentation
--------------
 
-The full documentation is at http://gryaml.rtfd.org."""
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 tests_require = [
@@ -22,7 +18,7 @@ setup(
     name='gryaml',
     use_scm_version=True,
     description='Represent Neo4j graph data as YAML.',
-    long_description=readme + '\n\n' + doclink + '\n\n' + history,
+    long_description=readme + '\n\n' + history,
     author='Wil Cooley',
     author_email='wcooley@nakedape.cc',
     url='https://github.com/wcooley/python-gryaml',
