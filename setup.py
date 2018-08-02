@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """Setuptools setup."""
 
+import os
 from setuptools import setup, find_packages
 
 with open('README.rst') as fp:
@@ -9,9 +10,12 @@ with open('README.rst') as fp:
 with open('HISTORY.rst') as fp:
     history = fp.read().replace('.. :changelog:', '')
 
+# Enable setting version higher for testing
+PY2NEO_MAX_VERSION = os.environ.get('PY2NEO_MAX_VERSION', '2')
+
 install_requires = [
     'boltons',
-    'py2neo<3',
+    'py2neo>=1.6,<={}.999'.format(PY2NEO_MAX_VERSION),
     'py2neo_compat~=1.0.0pre0',
     'pyyaml',
 ]
