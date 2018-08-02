@@ -1,0 +1,16 @@
+[run]
+branch = True
+
+[paths]
+source =
+    src
+    */lib/python*/site-packages
+
+[report]
+exclude_lines =
+    pragma: no cover
+    py2neo_ver == 3
+    py2neo_v3
+
+[html]
+directory = coverage

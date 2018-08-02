@@ -36,8 +36,8 @@ is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-Python Gryaml could always use more documentation, whether as part of the
-official Python Gryaml docs, in docstrings, or even on the web in blog posts,
+Gryaml could always use more documentation, whether as part of the
+official Gryaml docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
@@ -55,10 +55,10 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `gryaml` for
+Ready to contribute? Here's how to set up ``gryaml`` for
 local development.
 
-1. Fork_ the `python-gryaml` repo on GitHub.
+1. Fork_ the ``python-gryaml`` repo on GitHub.
 2. Clone your fork locally::
 
     $ git clone git@github.com:your_name_here/python-gryaml.git
@@ -67,14 +67,14 @@ local development.
 
     $ git checkout -b name-of-your-bugfix-or-feature
 
-Now you can make your changes locally.
+   Now you can make your changes locally.
 
 4. When you're done making changes, check that your changes pass style and unit
    tests, including testing other Python versions with tox::
 
     $ tox
 
-To get tox, just pip install it.
+   To get tox, just pip install it.
 
 5. Commit your changes and push your branch to GitHub::
 

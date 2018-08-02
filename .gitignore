@@ -23,9 +23,13 @@ lib64
 pip-log.txt
 
 # Unit test / coverage reports
-.coverage
 .tox
 nosetests.xml
+coverage.xml
+/coverage/*
+/htmlcov/*
+.coverage.*
+.coverage
 
 # Translations
 *.mo
@@ -50,7 +54,10 @@ docs/_build
 .testmondata
 
 # pytest cache
-.cache
+.*cache
+
+# pyenv local
+.python-version
 
 # Editor/OS
 *~
@@ -59,3 +66,6 @@ docs/_build
 
 # JUnit-compatible test reports
 junit-*.xml
+
+# Local env
+.env

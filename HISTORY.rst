@@ -3,11 +3,23 @@
 History
 -------
 
+1.0.0 (2018-08-02)
+++++++++++++++++++
+
+* Require registration for YAML constructors & representers -- this no longer
+  happens automatically as a side-effect of importing the ``gryaml`` package.
+* Add "simple" constructors & representers, to convert Nodes or Relationships
+  to plain YAML structures or YAML structures tagged with '!gryaml.*' to
+  plain Python structures.
+* Reorganized repo so package is in ``src/``.
+* Added more tests.
+* Use ``py2neo_compat`` as compatibility layer.
+
 0.4.0 (2017-08-30)
 ++++++++++++++++++
 
-* Enable using application-specific tags `gryaml.node` and `gryaml.rel` to
-  construct instead of PyYAML's general-purpose `!python/object/apply:`.
+* Enable using application-specific tags ``gryaml.node`` and ``gryaml.rel`` to
+  construct instead of PyYAML's general-purpose ``!python/object/apply:``.
 
 0.3.1 (2016-10-28)
 ++++++++++++++++++

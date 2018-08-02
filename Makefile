@@ -1,42 +1,37 @@
-.PHONY: help clean clean-pyc clean-build list test test-all coverage docs release sdist
+.PHONY: help clean clean-pyc clean-build lint test test-all docs release sdist
 
 help:
 	@echo "clean-build - remove build artifacts"
 	@echo "clean-pyc - remove Python file artifacts"
 	@echo "lint - check style with flake8"
 	@echo "test - run tests quickly with the default Python"
-	@echo "testall - run tests on every Python version with tox"
-	@echo "coverage - check code coverage quickly with the default Python"
+	@echo "test-all - run tests on multiple Python versions with tox"
 	@echo "docs - generate Sphinx HTML documentation, including API docs"
-	@echo "release - package and upload a release"
+	@echo "release - package a release"
 	@echo "sdist - package"
 
 clean: clean-build clean-pyc
 
 clean-build:
-	rm -fr build/
-	rm -fr dist/
-	rm -fr *.egg-info
+	- rm -fr build/ 
+	- rm -fr dist/
+	- rm -fr {*/,}*.egg-info
+	- rm junit-*.xml
+	- rm -r coverage/
 
 clean-pyc:
-	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f {} +
+	# Use '*' to not match .tox
+	find */ -name '*.pyc' -o -name '*.pyo' -o -name '*~' -delete
+	find */ -name __pycache__ -type d -empty -print0 | xargs -0 rmdir
 
 lint:
-	flake8 gryaml test
+	tox -e lint
 
 test:
 	py.test
 
 test-all:
 	tox
-
-coverage:
-	coverage run --source gryaml setup.py test
-	coverage report -m
-	coverage html
-	open htmlcov/index.html
 
 docs:
 	rm -f docs/gryaml.rst
@@ -47,10 +42,10 @@ docs:
 	open docs/_build/html/index.html
 
 release: clean
-	python setup.py sdist upload
-	python setup.py bdist_wheel upload
+	python setup.py sdist
+	python setup.py bdist_wheel
 
 sdist: clean
 	python setup.py sdist
-	python setup.py bdist_wheel upload
+	python setup.py bdist_wheel
 	ls -l dist
