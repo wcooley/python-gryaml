@@ -12,7 +12,6 @@ The full documentation is at http://gryaml.rtfd.org."""
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 tests_require = [
-    'coverage',
     'pytest',
     'pytest-cov',
     'pytest-forked',
@@ -40,13 +39,6 @@ setup(
     tests_require=tests_require,
     extras_require={
         'test': tests_require,
-        'lint': [
-            'flake8',
-            'flake8-docstrings',
-            'flake8-formatter-junit-xml',
-            'pep8-naming',
-            'pydocstyle',
-        ],
     },
     license='MIT',
     zip_safe=False,

@@ -6,8 +6,8 @@ History
 0.4.0 (2017-08-30)
 ++++++++++++++++++
 
-* Enable using application-specific tags `gryaml.node` and `gryaml.rel` to
-  construct instead of PyYAML's general-purpose `!python/object/apply:`.
+* Enable using application-specific tags ``gryaml.node`` and ``gryaml.rel`` to
+  construct instead of PyYAML's general-purpose ``!python/object/apply:``.
 
 0.3.1 (2016-10-28)
 ++++++++++++++++++
