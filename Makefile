@@ -25,7 +25,7 @@ clean-pyc:
 	find */ -name __pycache__ -type d -empty -print0 | xargs -0 rmdir
 
 lint:
-	flake8 gryaml test
+	tox -e lint
 
 test:
 	py.test
