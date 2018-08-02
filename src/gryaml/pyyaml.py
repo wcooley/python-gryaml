@@ -31,8 +31,11 @@ def render_node(graph_node):
     ."""
     data = []
 
-    if graph_node.labels:
-        data.append({'labels': list(graph_node.labels)})
+    try:
+        if graph_node.labels:
+            data.append({'labels': list(graph_node.labels)})
+    except TypeError:  # "Abstract nodes cannot have labels"
+        pass
 
     properties = to_dict(graph_node)
     if properties:
