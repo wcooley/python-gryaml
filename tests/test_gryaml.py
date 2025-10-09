@@ -92,7 +92,7 @@ def test_relationship_structures_offline(sample_yaml):
 
     directed_rel = [(r.start_node, r, r.end_node)
                     for r in result
-                    if isinstance(r, Relationship) and r.type == 'DIRECTED']
+                    if isinstance(r, Relationship) and r.reltype == 'DIRECTED']
     assert_lana_directed_matrix(directed_rel)
 
 
@@ -126,7 +126,7 @@ def test_complex_related_graph_offline(sample_yaml):
     directed_rel = [(r.start_node, r, r.end_node)
                     for r in result
                     if isinstance(r, Relationship) and
-                    r.type == 'DIRECTED' and
+                    r.reltype == 'DIRECTED' and
                     r.end_node['title'] == 'The Matrix']
     assert_lana_directed_matrix(directed_rel)
 
@@ -572,7 +572,7 @@ def assert_lana_directed_matrix(result):
     assert 1 == len(result)
     person, relationship, movie = first(result)
     assert 'Lana Wachowski' == person['name']
-    assert 'DIRECTED' == relationship.type
+    assert 'DIRECTED' == relationship.reltype
     assert 'The Matrix' == movie['title']
 
 
@@ -621,7 +621,7 @@ def test_helpers(graphdb):
     assert 3 == len(all_rels)
     for rel_ in all_rels:
         assert isinstance(rel_, Relationship)
-        assert rel_.type in {'ACTED_IN', 'DIRECTED'}
+        assert rel_.reltype in {'ACTED_IN', 'DIRECTED'}
 
     all_nodes = match_all_nodes(graphdb)
     assert 4 == len(all_nodes)
