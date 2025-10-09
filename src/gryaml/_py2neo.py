@@ -9,7 +9,6 @@ except ImportError:
     """Module :mod:`typing` not required for Py27-compatible type comments."""
 
 import py2neo_compat
-py2neo_compat.monkey_patch_py2neo()
 
 from py2neo_compat import (  # noqa
     Graph, Node, Relationship, create_node, foremost,
