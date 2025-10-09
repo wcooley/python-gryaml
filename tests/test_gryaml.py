@@ -14,6 +14,7 @@ import py2neo_compat
 # noinspection PyProtectedMember
 from gryaml.pyyaml import _unregister as gryaml_unregister
 from py2neo_compat import (
+    cypher_execute,
     foremost,
     Graph,
     Node,
@@ -68,9 +69,9 @@ def test_node_parameter_permutations(graphdb, sample_yaml):
     assert 3 == len(result)  # All nodes
     result = match_all_nodes_and_rels(graphdb)
     assert 0 == len(result)  # No relationships
-    result = graphdb.cypher.execute('MATCH (n:person) RETURN n')
+    result = cypher_execute(graphdb, 'MATCH (n:person) RETURN n')
     assert 2 == len(result)  # 2 nodes with `person` label
-    result = graphdb.cypher.execute('MATCH (n) WHERE exists(n.occupation)'
+    result = cypher_execute(graphdb, 'MATCH (n) WHERE exists(n.occupation)'
                                     ' RETURN n')
     assert 2 == len(result)  # 2 nodes with `occupation` property
 
@@ -107,7 +108,7 @@ def test_relationship_structures(graphdb, sample_yaml):
     assert 3 == len(result)  # 3 nodes
     result = match_all_nodes_and_rels(graphdb)
     assert 2 == len(result)  # 2 relationships
-    result = graphdb.cypher.execute('MATCH (p)-[r:DIRECTED]->(m)'
+    result = cypher_execute(graphdb, 'MATCH (p)-[r:DIRECTED]->(m)'
                                     ' RETURN p,r,m')
     assert_lana_directed_matrix(result)
 
@@ -138,7 +139,7 @@ def test_complex_related_graph(graphdb, sample_yaml):
 
     result = yaml.load(sample_yaml('nodes-and-relationships'))
     assert 21 == len(result)
-    result = graphdb.cypher.execute("""
+    result = cypher_execute(graphdb, """
         MATCH (p)-[r:DIRECTED]->(m{title:"The Matrix"})
         RETURN p,r,m
         """)
@@ -460,7 +461,7 @@ def test_representers(graphdb):
     gryaml.register()
 
     # language=cypher
-    graphdb.cypher.execute("""
+    cypher_execute(graphdb, """
         CREATE (cloudAtlas:Movie { title:"Cloud Atlas",released:2012 })
         CREATE (forrestGump:Movie { title:"Forrest Gump",released:1994 })
         CREATE (robert:Person { name:"Robert Zemeckis", born:1951 })
@@ -536,7 +537,7 @@ def test_quoting(graphdb):
         """).lstrip()
 
     # language=cypher
-    graphdb.cypher.execute("""
+    cypher_execute(graphdb, """
         CREATE (gertie:`Special Person` {`Pet Name`: 'Gertie'})
         CREATE (alice:`Also Special Person` {`Real Name`: 'Alice B. Toklas'})
         CREATE (alice)-[ilw:`IN LOVE WITH`]->(gertie) RETURN *;
@@ -547,7 +548,7 @@ def test_quoting(graphdb):
     yaml_serial = yaml_serial.lstrip().replace('!!python/unicode', '!!str')
     assert expected_yaml == yaml_serial
 
-    graphdb.cypher.execute('MATCH (n) DETACH DELETE n')
+    cypher_execute(graphdb, 'MATCH (n) DETACH DELETE n')
     assert 0 == len(list(graphdb.match()))
 
     loaded_entities = yaml.load(yaml_serial)
@@ -578,14 +579,14 @@ def assert_lana_directed_matrix(result):
 def match_all_nodes(graphdb):
     # type: (Graph) -> List[Node]
     """Query for all nodes."""
-    return [foremost(r) for r in graphdb.cypher.execute('MATCH (n) RETURN n')]
+    return [foremost(r) for r in cypher_execute(graphdb, 'MATCH (n) RETURN n')]
 
 
 def match_all_nodes_and_rels(graphdb):
     # type: (Graph) -> List[List[Node, Relationship, Node]]
     """Query for all nodes and relationships."""
     return [list(r)
-            for r in graphdb.cypher.execute('MATCH (n1)-[r]->(n2)'
+            for r in cypher_execute(graphdb, 'MATCH (n1)-[r]->(n2)'
                                             ' RETURN n1, r, n2')]
 
 
@@ -593,13 +594,13 @@ def match_all_rels(graphdb):
     # type: (Graph) -> List[Node]
     """Query for all relationships."""
     return [foremost(r)
-            for r in graphdb.cypher.execute('MATCH ()-[r]->() RETURN r')]
+            for r in cypher_execute(graphdb, 'MATCH ()-[r]->() RETURN r')]
 
 
 def test_helpers(graphdb):
     # type: (Graph) -> None
     """Ensure that test helpers work as expected."""
-    r = graphdb.cypher.execute("""
+    r = cypher_execute(graphdb, """
         CREATE (cloudAtlas:Movie { title:"Cloud Atlas",released:2012 })
         CREATE (forrestGump:Movie { title:"Forrest Gump",released:1994 })
         CREATE (robert:Person { name:"Robert Zemeckis", born:1951 })
