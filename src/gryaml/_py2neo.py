@@ -90,7 +90,7 @@ def node(*args):
         - properties:
             name: 'Bob Newhart'
             occupation: 'Comedian'
-    ''')
+    ''', yaml.Loader)
     >>> isinstance(result, Node)
     """
     labels = first(arg['labels']

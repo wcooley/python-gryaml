@@ -39,7 +39,7 @@ def test_node_parameter_permutation_offline(sample_yaml):
     """Test nodes offline."""
     gryaml.register()
 
-    result = yaml.load(sample_yaml('node-parameter-permutations'))
+    result = yaml.load(sample_yaml('node-parameter-permutations'), yaml.Loader)
 
     # All nodes
     assert 3 == len(result)
@@ -63,7 +63,7 @@ def test_node_parameter_permutations(graphdb, sample_yaml):
     """Test node representation."""
     gryaml.register()
 
-    result = yaml.load(sample_yaml('node-parameter-permutations'))
+    result = yaml.load(sample_yaml('node-parameter-permutations'), yaml.Loader)
     assert 3 == len(result)
     result = match_all_nodes(graphdb)
     assert 3 == len(result)  # All nodes
@@ -83,7 +83,7 @@ def test_relationship_structures_offline(sample_yaml):
     """Test relationship representations offline."""
     gryaml.register()
 
-    result = yaml.load(sample_yaml('relationships'))
+    result = yaml.load(sample_yaml('relationships'), yaml.Loader)
     assert 5 == len(result)
     nodes = [n for n in result if isinstance(n, Node)]
     assert 3 == len(nodes)  # 3 nodes
@@ -102,7 +102,7 @@ def test_relationship_structures(graphdb, sample_yaml):
     """Test relationship representation."""
     gryaml.register()
 
-    result = yaml.load(sample_yaml('relationships'))
+    result = yaml.load(sample_yaml('relationships'), yaml.Loader)
     assert 5 == len(result)
     result = match_all_nodes(graphdb)
     assert 3 == len(result)  # 3 nodes
@@ -120,7 +120,7 @@ def test_complex_related_graph_offline(sample_yaml):
     """Test graph with multiples nodes & relationships offline."""
     gryaml.register()
 
-    result = yaml.load(sample_yaml('nodes-and-relationships'))
+    result = yaml.load(sample_yaml('nodes-and-relationships'), yaml.Loader)
     assert 21 == len(result)
 
     directed_rel = [(r.start_node, r, r.end_node)
@@ -137,7 +137,7 @@ def test_complex_related_graph(graphdb, sample_yaml):
     """Test loading a graph with multiple nodes & relationships."""
     gryaml.register()
 
-    result = yaml.load(sample_yaml('nodes-and-relationships'))
+    result = yaml.load(sample_yaml('nodes-and-relationships'), yaml.Loader)
     assert 21 == len(result)
     result = cypher_execute(graphdb, """
         MATCH (p)-[r:DIRECTED]->(m{title:"The Matrix"})
@@ -170,12 +170,12 @@ def test_node_can_be_loaded_and_created(graphdb):
             - person
         """
 
-    node_loaded = yaml.load(sample_yaml)
+    node_loaded = yaml.load(sample_yaml, yaml.Loader)
     node_found = foremost(match_all_nodes(graphdb))
 
     assert node_loaded == node_found
 
-    node_data = yaml.load(sample_yaml.replace('!gryaml.node', ''))
+    node_data = yaml.load(sample_yaml.replace('!gryaml.node', ''), yaml.Loader)
 
     assert node_data[0]['properties'] == py2neo_compat.to_dict(node_loaded)
     assert node_data[1]['labels'] == list(node_loaded.labels)
@@ -201,10 +201,10 @@ def test_node_can_be_loaded_simple():
 
     node_loaded = yaml.safe_load(sample_yaml)
 
-    node_data = yaml.load(sample_yaml.replace('!gryaml.node', ''))
+    node_data = yaml.load(sample_yaml.replace('!gryaml.node', ''), yaml.Loader)
     assert node_data == node_loaded
 
-    node_data = yaml.load(sample_yaml.replace('!gryaml.node', '!!seq'))
+    node_data = yaml.load(sample_yaml.replace('!gryaml.node', '!!seq'), yaml.Loader)
     assert node_data == node_loaded
 
 
@@ -306,7 +306,7 @@ def test_node_can_be_dumped_then_loaded(graphdb):
         !gryaml.node
         - labels: [person]
         - properties: {name: Babs_Jensen}
-    """)
+    """, yaml.Loader)
 
     babs_yaml1 = yaml.dump(n)
 
@@ -320,7 +320,7 @@ def test_node_can_be_dumped_then_loaded(graphdb):
     graphdb.delete_all()
     assert 0 == len(match_all_nodes(graphdb))
 
-    yaml.load(babs_yaml2)
+    yaml.load(babs_yaml2, yaml.Loader)
 
     r = match_all_nodes(graphdb)
     assert 1 == len(r)
@@ -427,7 +427,7 @@ def test_rel_can_be_dumped_then_loaded(graphdb):
                 - movie
             - properties:
                 name: Animal House
-    """)
+    """, yaml.Loader)
 
     sample_yaml1 = yaml.dump(r)
 
@@ -442,7 +442,7 @@ def test_rel_can_be_dumped_then_loaded(graphdb):
 
     assert 0 == len(match_all_nodes(graphdb))
 
-    yaml.load(sample_yaml2)
+    yaml.load(sample_yaml2, yaml.Loader)
 
     result = match_all_rels(graphdb)
     assert 1 == len(result)
@@ -551,7 +551,7 @@ def test_quoting(graphdb):
     cypher_execute(graphdb, 'MATCH (n) DETACH DELETE n')
     assert 0 == len(list(graphdb.match()))
 
-    loaded_entities = yaml.load(yaml_serial)
+    loaded_entities = yaml.load(yaml_serial, yaml.Loader)
     queried_entities = [list(r) for r in graphdb.match()]
 
     assert loaded_entities
