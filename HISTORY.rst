@@ -3,6 +3,13 @@
 History
 -------
 
+1.1.0 (2025-10-15)
+++++++++++++++++++
+
+* Update build system.
+* Delegate neo4j schema & other stuff to ``py2neo_compat``.
+* Update tox testing targets to test py2neo v2 on Python 3.6 and v2021 on 3.8.
+
 1.0.0 (2018-08-02)
 ++++++++++++++++++
 
