@@ -1,68 +1,30 @@
 #!/usr/bin/env python
+
 """Setuptools setup."""
 
-import os
 from setuptools import setup, find_packages
 
-with open('README.rst') as fp:
-    readme = fp.read()
+import tomli
 
-with open('HISTORY.rst') as fp:
-    history = fp.read().replace('.. :changelog:', '')
 
-# Enable setting version higher for testing
-PY2NEO_MAX_VERSION = os.environ.get('PY2NEO_MAX_VERSION', '2')
+if __name__ == '__main__':
+    # This is probably pretty fragile
+    with open('pyproject.toml', 'rb') as inp:
+        pyproject = tomli.load(inp)
 
-install_requires = [
-    'boltons',
-    'py2neo>=1.6,<={}.999'.format(PY2NEO_MAX_VERSION),
-    'py2neo_compat~=1.0.0pre0',
-    'pyyaml',
-]
+    console_scripts = ['{} = {}'.format(k, v)
+                       for k, v in pyproject['project']['scripts'].items()]
 
-tests_require = [
-    'pytest',
-    'pytest-cov',
-    'pytest-forked',
-    'pathlib2; python_version<"3"',
-]
-
-setup(
-    name='gryaml',
-    use_scm_version=True,
-    description='Represent Neo4j graph data as YAML.',
-    long_description=readme + '\n\n' + history,
-    author='Wil Cooley',
-    author_email='wcooley@nakedape.cc',
-    url='https://github.com/wcooley/python-gryaml',
-    packages=find_packages(where='src', include=['gryaml']),
-    package_dir={'': 'src'},
-    include_package_data=True,
-    install_requires=install_requires,
-    setup_requires=['setuptools_scm'],
-    tests_require=tests_require,
-    extras_require={
-        'test': tests_require,
-    },
-    license='MIT',
-    zip_safe=False,
-    keywords='yaml py2neo neo4j gryaml',
-    classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: Implementation :: PyPy',
-    ],
-    entry_points={
-        'console_scripts': [
-            'gryaml-load = gryaml.__main__:__main__',
+    setup(
+        name=pyproject['project']['name'],
+        version='1.0.0',
+        license=pyproject['project']['license']['text'],
+        description=pyproject['project']['description'],
+        packages=find_packages(where='src/', include=['*']),
+        package_dir={'': 'src'},
+        py_modules=[
         ],
-    },
-)
+        install_requires=pyproject['project']['dependencies'],
+        extras_require=pyproject['project']['optional-dependencies'],
+        entry_points={'console_scripts': console_scripts},
+    )

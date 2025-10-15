@@ -11,6 +11,8 @@ try:
 except ImportError:
     """Module :mod:`typing` not required for Py27-compatible type comments."""
 
+from py2neo_compat.schema import drop_schema
+
 import gryaml
 gryaml.register()
 
@@ -55,53 +57,12 @@ def __main__():  # noqa: N802
     for yaml_file in config.yaml_files:
         print(yaml_file)
         with open(yaml_file) as stream:
-            yaml.load(stream)
-
-
-def schema_constraints(graph):
-    # type: (Graph) -> Iterator[Tuple[str, List[str], str]]
-    """Query iterable list of *all* schema constraints.
-
-    This works around the fact that, in Neo4j 2.3 and :mod:`py2neo` 2.0.8 at
-    least, `graph.node_labels` only returns labels used by extant nodes, whereas
-    previously it returned all labels, which are needed for clearing the
-    constrain schema by iterating over the labels.
-    """
-    constraint_resource = graph.resource.resolve('schema/constraint')
-
-    # return constraint_resource.get().content
-    return ((c['label'], c['property_keys'], c['type'])
-            for c in constraint_resource.get().content)
-
-
-def schema_indexes(graph):
-    # type: (Graph) -> List[Tuple[str, List[str]]]
-    """Query iterable list of *all* schema indexes.
-
-    This works around the fact that, in Neo4j 2.3 and :mod:`py2neo` 2.0.8 at
-    least, `graph.node_labels` only returns labels used by extant nodes, whereas
-    previously it returned all labels, which are needed for clearing the
-    constrain schema by iterating over the labels.
-    """
-    index_resource = graph.resource.resolve('schema/index')
-
-    return [(n['label'], n['property_keys']) for n in
-            index_resource.get().content]
-
+            yaml.load(stream, yaml.Loader)
 
 def cleanup_graph(graph):
     # type: (Graph) -> None
     """Delete all entities & drop indexes & constraints."""
-    constraint_dispatch = {
-        'UNIQUENESS': graph.schema.drop_uniqueness_constraint,
-    }
-
-    for label, property_keys, type in schema_constraints(graph):
-        constraint_dispatch[type](label, property_keys)
-
-    for label, property_keys in schema_indexes(graph):
-        graph.schema.drop_index(label, property_keys)
-
+    drop_schema(graph)
     graph.delete_all()
 
 
