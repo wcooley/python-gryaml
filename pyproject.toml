@@ -8,10 +8,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gryaml"
-#authors = [{name = "Wil Cooley", email = "wcooley@nakedape.cc"}]
-authors = ["Wil Cooley <wcooley@nakedape.cc>"]
-#license = {text = "MIT"}
-license = "MIT"
+authors = [{name = "Wil Cooley", email = "wcooley@nakedape.cc"}]
+license = {text = "MIT"}
 description = "Represent Neo4j graph data as YAML."
 dynamic = ["version"]
 keywords = ["yaml", "py2neo", "neo4j", "gryaml"]
@@ -25,7 +23,7 @@ classifiers = [
 urls = {Homepage = "https://github.com/wcooley/python-gryaml"}
 dependencies = [
     "boltons",
-    "py2neo>=2.0,<=2021.999",
+    "py2neo",
     "py2neo_compat~=2.0.0rc0",
     "pyyaml",
 ]
@@ -35,6 +33,12 @@ test = [
     "pytest",
     "pytest-cov",
     "pytest-forked",
+]
+py2neo2 = [
+    "py2neo~=2.0.9"
+]
+py2neo2021 = [
+    "py2neo~=2021.2.4"
 ]
 
 [project.scripts]

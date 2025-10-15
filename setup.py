@@ -12,10 +12,13 @@ if __name__ == '__main__':
     with open('pyproject.toml', 'rb') as inp:
         pyproject = tomli.load(inp)
 
+    console_scripts = ['{} = {}'.format(k, v)
+                       for k, v in pyproject['project']['scripts'].items()]
+
     setup(
         name=pyproject['project']['name'],
         version='1.0.0',
-        license=pyproject['project']['license'],
+        license=pyproject['project']['license']['text'],
         description=pyproject['project']['description'],
         packages=find_packages(where='src/', include=['*']),
         package_dir={'': 'src'},
@@ -23,9 +26,5 @@ if __name__ == '__main__':
         ],
         install_requires=pyproject['project']['dependencies'],
         extras_require=pyproject['project']['optional-dependencies'],
-        entry_points={
-            'console_scripts': [
-                'gryaml-load = gryaml.__main__:__main__',
-            ],
-        }
+        entry_points={'console_scripts': console_scripts},
     )
