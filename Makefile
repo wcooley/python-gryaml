@@ -20,8 +20,8 @@ clean-build:
 	- rm -r coverage/
 
 clean-pyc:
-	# Use '*' to not match .tox
-	find */ -name '*.pyc' -o -name '*.pyo' -o -name '*~' -delete
+	@# Use '*' to not match .tox
+	find */ \( -name '*.pyc' -o -name '*.pyo' -o -name '*~' \) -delete
 	find */ -name __pycache__ -type d -empty -print0 | xargs -0 rmdir
 
 lint:

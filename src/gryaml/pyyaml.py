@@ -85,7 +85,7 @@ def render_relationship(graph_rel):
     """
     data = [
         graph_rel.start_node,
-        graph_rel.type,
+        graph_rel.reltype,
         graph_rel.end_node,
     ]
 

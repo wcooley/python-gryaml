@@ -14,6 +14,7 @@ import py2neo_compat
 # noinspection PyProtectedMember
 from gryaml.pyyaml import _unregister as gryaml_unregister
 from py2neo_compat import (
+    cypher_execute,
     foremost,
     Graph,
     Node,
@@ -38,7 +39,7 @@ def test_node_parameter_permutation_offline(sample_yaml):
     """Test nodes offline."""
     gryaml.register()
 
-    result = yaml.load(sample_yaml('node-parameter-permutations'))
+    result = yaml.load(sample_yaml('node-parameter-permutations'), yaml.Loader)
 
     # All nodes
     assert 3 == len(result)
@@ -62,15 +63,15 @@ def test_node_parameter_permutations(graphdb, sample_yaml):
     """Test node representation."""
     gryaml.register()
 
-    result = yaml.load(sample_yaml('node-parameter-permutations'))
+    result = yaml.load(sample_yaml('node-parameter-permutations'), yaml.Loader)
     assert 3 == len(result)
     result = match_all_nodes(graphdb)
     assert 3 == len(result)  # All nodes
     result = match_all_nodes_and_rels(graphdb)
     assert 0 == len(result)  # No relationships
-    result = graphdb.cypher.execute('MATCH (n:person) RETURN n')
+    result = cypher_execute(graphdb, 'MATCH (n:person) RETURN n')
     assert 2 == len(result)  # 2 nodes with `person` label
-    result = graphdb.cypher.execute('MATCH (n) WHERE exists(n.occupation)'
+    result = cypher_execute(graphdb, 'MATCH (n) WHERE exists(n.occupation)'
                                     ' RETURN n')
     assert 2 == len(result)  # 2 nodes with `occupation` property
 
@@ -82,7 +83,7 @@ def test_relationship_structures_offline(sample_yaml):
     """Test relationship representations offline."""
     gryaml.register()
 
-    result = yaml.load(sample_yaml('relationships'))
+    result = yaml.load(sample_yaml('relationships'), yaml.Loader)
     assert 5 == len(result)
     nodes = [n for n in result if isinstance(n, Node)]
     assert 3 == len(nodes)  # 3 nodes
@@ -91,7 +92,7 @@ def test_relationship_structures_offline(sample_yaml):
 
     directed_rel = [(r.start_node, r, r.end_node)
                     for r in result
-                    if isinstance(r, Relationship) and r.type == 'DIRECTED']
+                    if isinstance(r, Relationship) and r.reltype == 'DIRECTED']
     assert_lana_directed_matrix(directed_rel)
 
 
@@ -101,13 +102,13 @@ def test_relationship_structures(graphdb, sample_yaml):
     """Test relationship representation."""
     gryaml.register()
 
-    result = yaml.load(sample_yaml('relationships'))
+    result = yaml.load(sample_yaml('relationships'), yaml.Loader)
     assert 5 == len(result)
     result = match_all_nodes(graphdb)
     assert 3 == len(result)  # 3 nodes
     result = match_all_nodes_and_rels(graphdb)
     assert 2 == len(result)  # 2 relationships
-    result = graphdb.cypher.execute('MATCH (p)-[r:DIRECTED]->(m)'
+    result = cypher_execute(graphdb, 'MATCH (p)-[r:DIRECTED]->(m)'
                                     ' RETURN p,r,m')
     assert_lana_directed_matrix(result)
 
@@ -119,13 +120,13 @@ def test_complex_related_graph_offline(sample_yaml):
     """Test graph with multiples nodes & relationships offline."""
     gryaml.register()
 
-    result = yaml.load(sample_yaml('nodes-and-relationships'))
+    result = yaml.load(sample_yaml('nodes-and-relationships'), yaml.Loader)
     assert 21 == len(result)
 
     directed_rel = [(r.start_node, r, r.end_node)
                     for r in result
                     if isinstance(r, Relationship) and
-                    r.type == 'DIRECTED' and
+                    r.reltype == 'DIRECTED' and
                     r.end_node['title'] == 'The Matrix']
     assert_lana_directed_matrix(directed_rel)
 
@@ -136,9 +137,9 @@ def test_complex_related_graph(graphdb, sample_yaml):
     """Test loading a graph with multiple nodes & relationships."""
     gryaml.register()
 
-    result = yaml.load(sample_yaml('nodes-and-relationships'))
+    result = yaml.load(sample_yaml('nodes-and-relationships'), yaml.Loader)
     assert 21 == len(result)
-    result = graphdb.cypher.execute("""
+    result = cypher_execute(graphdb, """
         MATCH (p)-[r:DIRECTED]->(m{title:"The Matrix"})
         RETURN p,r,m
         """)
@@ -169,12 +170,12 @@ def test_node_can_be_loaded_and_created(graphdb):
             - person
         """
 
-    node_loaded = yaml.load(sample_yaml)
+    node_loaded = yaml.load(sample_yaml, yaml.Loader)
     node_found = foremost(match_all_nodes(graphdb))
 
     assert node_loaded == node_found
 
-    node_data = yaml.load(sample_yaml.replace('!gryaml.node', ''))
+    node_data = yaml.load(sample_yaml.replace('!gryaml.node', ''), yaml.Loader)
 
     assert node_data[0]['properties'] == py2neo_compat.to_dict(node_loaded)
     assert node_data[1]['labels'] == list(node_loaded.labels)
@@ -200,10 +201,10 @@ def test_node_can_be_loaded_simple():
 
     node_loaded = yaml.safe_load(sample_yaml)
 
-    node_data = yaml.load(sample_yaml.replace('!gryaml.node', ''))
+    node_data = yaml.load(sample_yaml.replace('!gryaml.node', ''), yaml.Loader)
     assert node_data == node_loaded
 
-    node_data = yaml.load(sample_yaml.replace('!gryaml.node', '!!seq'))
+    node_data = yaml.load(sample_yaml.replace('!gryaml.node', '!!seq'), yaml.Loader)
     assert node_data == node_loaded
 
 
@@ -305,7 +306,7 @@ def test_node_can_be_dumped_then_loaded(graphdb):
         !gryaml.node
         - labels: [person]
         - properties: {name: Babs_Jensen}
-    """)
+    """, yaml.Loader)
 
     babs_yaml1 = yaml.dump(n)
 
@@ -319,7 +320,7 @@ def test_node_can_be_dumped_then_loaded(graphdb):
     graphdb.delete_all()
     assert 0 == len(match_all_nodes(graphdb))
 
-    yaml.load(babs_yaml2)
+    yaml.load(babs_yaml2, yaml.Loader)
 
     r = match_all_nodes(graphdb)
     assert 1 == len(r)
@@ -426,7 +427,7 @@ def test_rel_can_be_dumped_then_loaded(graphdb):
                 - movie
             - properties:
                 name: Animal House
-    """)
+    """, yaml.Loader)
 
     sample_yaml1 = yaml.dump(r)
 
@@ -441,7 +442,7 @@ def test_rel_can_be_dumped_then_loaded(graphdb):
 
     assert 0 == len(match_all_nodes(graphdb))
 
-    yaml.load(sample_yaml2)
+    yaml.load(sample_yaml2, yaml.Loader)
 
     result = match_all_rels(graphdb)
     assert 1 == len(result)
@@ -460,7 +461,7 @@ def test_representers(graphdb):
     gryaml.register()
 
     # language=cypher
-    graphdb.cypher.execute("""
+    cypher_execute(graphdb, """
         CREATE (cloudAtlas:Movie { title:"Cloud Atlas",released:2012 })
         CREATE (forrestGump:Movie { title:"Forrest Gump",released:1994 })
         CREATE (robert:Person { name:"Robert Zemeckis", born:1951 })
@@ -536,7 +537,7 @@ def test_quoting(graphdb):
         """).lstrip()
 
     # language=cypher
-    graphdb.cypher.execute("""
+    cypher_execute(graphdb, """
         CREATE (gertie:`Special Person` {`Pet Name`: 'Gertie'})
         CREATE (alice:`Also Special Person` {`Real Name`: 'Alice B. Toklas'})
         CREATE (alice)-[ilw:`IN LOVE WITH`]->(gertie) RETURN *;
@@ -547,10 +548,10 @@ def test_quoting(graphdb):
     yaml_serial = yaml_serial.lstrip().replace('!!python/unicode', '!!str')
     assert expected_yaml == yaml_serial
 
-    graphdb.cypher.execute('MATCH (n) DETACH DELETE n')
+    cypher_execute(graphdb, 'MATCH (n) DETACH DELETE n')
     assert 0 == len(list(graphdb.match()))
 
-    loaded_entities = yaml.load(yaml_serial)
+    loaded_entities = yaml.load(yaml_serial, yaml.Loader)
     queried_entities = [list(r) for r in graphdb.match()]
 
     assert loaded_entities
@@ -571,21 +572,21 @@ def assert_lana_directed_matrix(result):
     assert 1 == len(result)
     person, relationship, movie = first(result)
     assert 'Lana Wachowski' == person['name']
-    assert 'DIRECTED' == relationship.type
+    assert 'DIRECTED' == relationship.reltype
     assert 'The Matrix' == movie['title']
 
 
 def match_all_nodes(graphdb):
     # type: (Graph) -> List[Node]
     """Query for all nodes."""
-    return [foremost(r) for r in graphdb.cypher.execute('MATCH (n) RETURN n')]
+    return [foremost(r) for r in cypher_execute(graphdb, 'MATCH (n) RETURN n')]
 
 
 def match_all_nodes_and_rels(graphdb):
     # type: (Graph) -> List[List[Node, Relationship, Node]]
     """Query for all nodes and relationships."""
     return [list(r)
-            for r in graphdb.cypher.execute('MATCH (n1)-[r]->(n2)'
+            for r in cypher_execute(graphdb, 'MATCH (n1)-[r]->(n2)'
                                             ' RETURN n1, r, n2')]
 
 
@@ -593,13 +594,13 @@ def match_all_rels(graphdb):
     # type: (Graph) -> List[Node]
     """Query for all relationships."""
     return [foremost(r)
-            for r in graphdb.cypher.execute('MATCH ()-[r]->() RETURN r')]
+            for r in cypher_execute(graphdb, 'MATCH ()-[r]->() RETURN r')]
 
 
 def test_helpers(graphdb):
     # type: (Graph) -> None
     """Ensure that test helpers work as expected."""
-    r = graphdb.cypher.execute("""
+    r = cypher_execute(graphdb, """
         CREATE (cloudAtlas:Movie { title:"Cloud Atlas",released:2012 })
         CREATE (forrestGump:Movie { title:"Forrest Gump",released:1994 })
         CREATE (robert:Person { name:"Robert Zemeckis", born:1951 })
@@ -620,7 +621,7 @@ def test_helpers(graphdb):
     assert 3 == len(all_rels)
     for rel_ in all_rels:
         assert isinstance(rel_, Relationship)
-        assert rel_.type in {'ACTED_IN', 'DIRECTED'}
+        assert rel_.reltype in {'ACTED_IN', 'DIRECTED'}
 
     all_nodes = match_all_nodes(graphdb)
     assert 4 == len(all_nodes)

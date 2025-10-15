@@ -1,0 +1,58 @@
+[build-system]
+requires = [
+    "setuptools==59.6.0",
+    "setuptools_scm==6.4.2",
+    "tomli",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gryaml"
+authors = [{name = "Wil Cooley", email = "wcooley@nakedape.cc"}]
+license = {text = "MIT"}
+description = "Represent Neo4j graph data as YAML."
+dynamic = ["version"]
+keywords = ["yaml", "py2neo", "neo4j", "gryaml"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.8",
+]
+urls = {Homepage = "https://github.com/wcooley/python-gryaml"}
+dependencies = [
+    "boltons",
+    "py2neo",
+    "py2neo_compat~=2.0.0rc0",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-forked",
+]
+py2neo2 = [
+    "py2neo~=2.0.9"
+]
+py2neo2021 = [
+    "py2neo~=2021.2.4"
+]
+
+[project.scripts]
+gryaml-load = "gryaml.__main__:__main__"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+zip-safe = false
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["gryaml"]
+namespaces = false
+
+[tool.setuptools_scm]
+
