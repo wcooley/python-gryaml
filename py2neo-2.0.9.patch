@@ -1,0 +1,15 @@
+--- a/site-packages/py2neo/packages/httpstream/http.py	2025-03-11 13:30:03.393572475 -0700
++++ b/site-packages/py2neo/packages/httpstream/http.py	2025-09-08 17:36:00.630890885 -0700
+@@ -288,9 +288,10 @@
+ def submit(method, uri, body, headers):
+     """ Submit one HTTP request.
+     """
++    new_headers = {}
+     for key, value in headers.items():
+-        del headers[key]
+-        headers[xstr(key)] = xstr(value)
++        new_headers[xstr(key)] = xstr(value)
++    headers = new_headers
+     headers["Host"] = xstr(uri.host_port)
+     if uri.user_info:
+         credentials = uri.user_info.encode("UTF-8")
