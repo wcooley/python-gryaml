@@ -54,3 +54,8 @@ namespaces = false
 
 [tool.setuptools_scm]
 
+[tool.ruff]
+line-length = 80
+
+[tool.ruff.format]
+quote-style = "single"
