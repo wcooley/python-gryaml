@@ -28,8 +28,7 @@ def pytest_report_header(config, start_path: Path):
 
 
 @pytest.fixture
-def graphdb():
-    # type: () -> py2neo.Graph
+def graphdb() -> py2neo.Graph:
     """Fixture connecting to graphdb."""
     if 'NEO4J_URI' not in os.environ:
         os.environ['NEO4J_URI'] = 'http://localhost:7474/db/data'
@@ -39,8 +38,7 @@ def graphdb():
 
 
 @pytest.fixture
-def graphdb_offline():
-    # type: () -> None
+def graphdb_offline() -> None:
     """Ensure the database is not connected."""
     if py2neo_ver < 2:
         pytest.skip('Offline not supported in py2neo < 2')
@@ -56,25 +54,20 @@ def graphdb_offline():
 
 
 @pytest.fixture(scope='session')
-def samples_path():
-    # type: () -> Path
+def samples_path() -> Path:
     return Path(__file__).parent / 'samples'
 
 @pytest.fixture(scope='session')
-def sample_file(samples_path):
-    # type: (Path) -> Callable[[str], str]
-    def sample_file(fname):
-        # type: (str) -> str
+def sample_file(samples_path: Path) -> Callable[[str], str]:
+    def sample_file(fname: str) -> str:
         fname = samples_path / fname
         with fname.open() as f:
             return f.read()
     return sample_file
 
 @pytest.fixture(scope='session')
-def sample_yaml(sample_file):
-    # type: (Callable[[str], str]) -> Callable[[str], str]
-    def sample_yaml(fname):
-        # type: (str) -> str
+def sample_yaml(sample_file: Callable[[str], str]) -> Callable[[str], str]:
+    def sample_yaml(fname: str) -> str:
         if not (fname.endswith('.yaml') or fname.endswith('.yml')):
             fname += '.yaml'
         return sample_file(fname)

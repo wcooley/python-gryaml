@@ -17,8 +17,7 @@ import gryaml
 gryaml.register()
 
 
-def parse_args(args=None):
-    # type: (Optional[List[str]]) -> Any
+def parse_args(args: Optional[List[str]] = None) -> Any:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(description=__doc__)
 
@@ -35,8 +34,7 @@ def parse_args(args=None):
     return parser.parse_args(args)
 
 
-def __main__():  # noqa: N802
-    # type: () -> None
+def __main__() -> None:  # noqa: N802
     config = parse_args()
 
     print('Using Neo4j database at {}'.format(config.neo4j_uri))
@@ -59,8 +57,7 @@ def __main__():  # noqa: N802
         with open(yaml_file) as stream:
             yaml.load(stream, yaml.Loader)
 
-def cleanup_graph(graph):
-    # type: (Graph) -> None
+def cleanup_graph(graph: Graph) -> None:
     """Delete all entities & drop indexes & constraints."""
     drop_schema(graph)
     graph.delete_all()
