@@ -2,7 +2,6 @@
 requires = [
     "setuptools",
     "setuptools_scm",
-    "tomli",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -32,7 +31,6 @@ dependencies = [
 test = [
     "pytest",
     "pytest-cov",
-    "pytest-forked",
 ]
 py2neo2021 = [
     "py2neo~=2021.2.4"
