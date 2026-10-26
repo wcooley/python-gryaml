@@ -1,6 +1,4 @@
 """Compatability layer for :mod:`py2neo` versions."""
-from __future__ import absolute_import
-
 from boltons.iterutils import first
 
 try:

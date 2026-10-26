@@ -1,27 +1,14 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """Shared fixtures for :mod:`pytest`."""
 
-from __future__ import print_function, absolute_import
-
 import os
+from pathlib import Path
 
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
-
-import pytest  # noqa
-
-import gryaml
 import py2neo
+import pytest
 import yaml
-
 from py2neo_compat import py2neo_ver
 
-pytest.mark.skip_py2neo1 = pytest.mark.skipif(py2neo_ver == 1,
-                                              reason='py2neo v1 not supported')
+import gryaml
 
 pytest.mark.todo = pytest.mark.xfail(reason='TODO', run=True, strict=True)
 

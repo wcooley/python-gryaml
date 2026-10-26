@@ -1,5 +1,5 @@
+
 """Tests for `gryaml` module."""
-from __future__ import print_function
 
 from textwrap import dedent
 
@@ -21,9 +21,7 @@ from py2neo_compat import (
     node,
     rel,
     Relationship,
-)  # noqa: F401
-
-py2neo_compat.monkey_patch_py2neo()
+)
 
 
 @pytest.fixture(autouse=True)
