@@ -2,22 +2,18 @@
 
 import argparse
 import os
+from typing import Any
 
 import yaml
-
-try:
-    from typing import Any, Iterator, List, Optional, Tuple  # noqa: F401
-    from py2neo_compat import Graph  # noqa: F401
-except ImportError:
-    """Module :mod:`typing` not required for Py27-compatible type comments."""
-
+from py2neo_compat import Graph
 from py2neo_compat.schema import drop_schema
 
 import gryaml
+
 gryaml.register()
 
 
-def parse_args(args: Optional[List[str]] = None) -> Any:
+def parse_args(args: list[str] | None = None) -> Any:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(description=__doc__)
 
@@ -34,15 +30,15 @@ def parse_args(args: Optional[List[str]] = None) -> Any:
     return parser.parse_args(args)
 
 
-def __main__() -> None:  # noqa: N802
+def __main__() -> None:
     config = parse_args()
 
-    print('Using Neo4j database at {}'.format(config.neo4j_uri))
+    print(f'Using Neo4j database at {config.neo4j_uri}')
 
     graph = gryaml.connect(config.neo4j_uri)
 
     # Ensure at least a minimally functioning connection
-    graph.neo4j_version
+    assert graph.neo4j_version
 
     # import sys, IPython; IPython.embed(); sys.exit()
     if config.drop:

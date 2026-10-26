@@ -1,18 +1,16 @@
 """Compatability layer for :mod:`py2neo` versions."""
+from collections.abc import Mapping
+from typing import Any
+
 from boltons.iterutils import first
-
-try:
-    from typing import Any, List, Mapping, Optional  # noqa: F401
-except ImportError:
-    """Module :mod:`typing` not required for Py27-compatible type comments."""
-
-import py2neo_compat
-
-from py2neo_compat import (  # noqa
-    Graph, Node, Relationship, create_node, foremost,
-    rel as py2neo_rel
+from py2neo_compat import (
+    Graph,
+    Node,
+    Relationship,
+    create_node,
+    foremost,
 )
-
+from py2neo_compat import rel as py2neo_rel
 
 try:
     from typing import TypeVar
@@ -22,12 +20,12 @@ except ImportError:
 
 # Avoid overwriting on reload
 try:
-    graphdb
+    graphdb: Graph
 except NameError:
     graphdb: Graph = None
 
 
-def connect(uri: Optional[str] = None, graph: Optional[Graph] = None) -> Graph:
+def connect(uri: str | None = None, graph: Graph | None = None) -> Graph:
     """Instantiate a module-level graph database connection."""
     global graphdb
 
@@ -92,7 +90,7 @@ def node(*args: Mapping[str,Any]) -> Node:
     return create_node(graph=graphdb, labels=labels, properties=properties)
 
 
-def resolve_rel_properties(properties: Optional[Mapping[str, str]] = None) -> Mapping[str, str]:
+def resolve_rel_properties(properties: Mapping[str, str] | None = None) -> Mapping[str, str]:
     """Extract properties from rel structure.
 
     This supports the properties of a rel being either an "arg map" with key
@@ -120,7 +118,7 @@ def resolve_rel_properties(properties: Optional[Mapping[str, str]] = None) -> Ma
     return properties
 
 
-def rel(head: Node, reltype: str, tail: Node, properties: Optional[Mapping[str, str]] = None) -> Relationship:
+def rel(head: Node, reltype: str, tail: Node, properties: Mapping[str, str] | None = None) -> Relationship:
     """Create relationships."""
     properties = resolve_rel_properties(properties)
     path = py2neo_rel(head, reltype, tail, **properties)

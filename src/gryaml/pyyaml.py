@@ -1,18 +1,16 @@
 """Support for dump/load w/PyYAML."""
-from typing import Dict, List, Optional, Union
 
 import yaml
-
 from py2neo_compat import Node, Relationship, to_dict
-# from py2neo.cypher.core import Record
 
+# from py2neo.cypher.core import Record
 from . import node, rel
 
-node_tag = u'!gryaml.node'
-rel_tag = u'!gryaml.rel'
+node_tag = '!gryaml.node'
+rel_tag = '!gryaml.rel'
 
 
-def render_node(graph_node: Node) -> List[Dict[str, Union[List[str], Dict[str, str]]]]:
+def render_node(graph_node: Node) -> list[dict[str, list[str] | dict[str, str]]]:
     """Render a Neo4j node as a list
 
     A node is rendered as a 0-2 item list, with the following items:
@@ -53,7 +51,7 @@ def node_representer_simple(dumper: yaml.SafeDumper, graph_node: Node) -> yaml.S
     return dumper.represent_list(render_node(graph_node))
 
 
-def node_constructor_simple(loader: yaml.SafeLoader, yaml_node: yaml.Node) -> List:
+def node_constructor_simple(loader: yaml.SafeLoader, yaml_node: yaml.Node) -> list:
     """Construct "node" with only primitive Python types."""
     return loader.construct_sequence(yaml_node, deep=True)
 
@@ -63,7 +61,7 @@ def node_constructor(loader: yaml.BaseLoader, yaml_node: yaml.Node) -> Node:
     return node(*node_constructor_simple(loader, yaml_node))
 
 
-def render_relationship(graph_rel: Relationship) -> List:
+def render_relationship(graph_rel: Relationship) -> list:
     """Render a Neo4j relationship as a list.
 
     Render relationships as a 3 or 4 item list:
@@ -100,7 +98,7 @@ def rel_representer_simple(dumper: yaml.SafeDumper, graph_rel: Relationship) -> 
     return dumper.represent_list(render_relationship(graph_rel))
 
 
-def rel_constructor_simple(loader: yaml.BaseLoader, yaml_node: yaml.Node) -> List:
+def rel_constructor_simple(loader: yaml.BaseLoader, yaml_node: yaml.Node) -> list:
     """Construct a sequence from a tagged YAML sequence."""
     return loader.construct_sequence(yaml_node, deep=True)
 
@@ -110,7 +108,7 @@ def rel_constructor(loader: yaml.BaseLoader, yaml_node: yaml.Node) -> Relationsh
     return rel(*rel_constructor_simple(loader, yaml_node))
 
 
-def register(safe: Optional[bool] = False) -> None:
+def register(safe: bool | None = False) -> None:
     """Register representers & constructors for nodes & rels."""
 
     if safe:

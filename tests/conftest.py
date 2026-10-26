@@ -1,6 +1,6 @@
 """Shared fixtures for :mod:`pytest`."""
-
 import os
+from collections.abc import Callable
 from pathlib import Path
 
 import py2neo
@@ -68,7 +68,7 @@ def sample_file(samples_path: Path) -> Callable[[str], str]:
 @pytest.fixture(scope='session')
 def sample_yaml(sample_file: Callable[[str], str]) -> Callable[[str], str]:
     def sample_yaml(fname: str) -> str:
-        if not (fname.endswith('.yaml') or fname.endswith('.yml')):
+        if not fname.endswith(('.yaml', '.yml')):
             fname += '.yaml'
         return sample_file(fname)
     return sample_yaml

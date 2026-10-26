@@ -1,26 +1,27 @@
 
 """Tests for `gryaml` module."""
 
-from textwrap import dedent
 from collections.abc import Callable
+from textwrap import dedent
 
+import py2neo_compat
 import pytest
 import yaml
 from boltons.iterutils import first
-
-import gryaml
-import py2neo_compat
-# noinspection PyProtectedMember
-from gryaml.pyyaml import _unregister as gryaml_unregister
 from py2neo_compat import (
-    cypher_execute,
-    foremost,
     Graph,
     Node,
+    Relationship,
+    cypher_execute,
+    foremost,
     node,
     rel,
-    Relationship,
 )
+
+import gryaml
+
+# noinspection PyProtectedMember
+from gryaml.pyyaml import _unregister as gryaml_unregister
 
 
 @pytest.fixture(autouse=True)
@@ -45,7 +46,7 @@ def test_node_parameter_permutation_offline(sample_yaml: (Callable[[str], str]))
 
     # 2 nodes with 'person' label
     assert 2 == len([n for n in result if n.labels])
-    assert {'person'} == set(first(n.labels) for n in result if n.labels)
+    assert {'person'} == {first(n.labels) for n in result if n.labels}
 
     # 2 nodes with `occupation` property
     occupations = [n['occupation'] for n in result if n['occupation']]
