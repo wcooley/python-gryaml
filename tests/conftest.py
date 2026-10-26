@@ -26,18 +26,16 @@ pytest.mark.skip_py2neo1 = pytest.mark.skipif(py2neo_ver == 1,
 pytest.mark.todo = pytest.mark.xfail(reason='TODO', run=True, strict=True)
 
 
-
-def pytest_report_header(config, startdir):
+def pytest_report_header(config, start_path: Path):
     """Add versions & config info to test output on terminal."""
     lines = []
 
     if 'NEO4J_URI' in os.environ:
-        lines.append('Neo4J URI: %s' % os.environ['NEO4J_URI'])
+        lines.append(f'Neo4J URI: {os.environ["NEO4J_URI"]}')
 
-    lines.append('py2neo: {0.__version__}'
-                 ' pyyaml: {1.__version__}'
-                 ' libyaml: {1.__with_libyaml__}'.format(py2neo, yaml))
-    lines.append('forked: %s' % config.getoption('forked', default=False))
+    lines.append(f'py2neo: {py2neo.__version__}'
+                 f' pyyaml: {yaml.__version__}'
+                 f' libyaml: {yaml.__with_libyaml__}')
 
     return lines
 
