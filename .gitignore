@@ -18,6 +18,7 @@ develop-eggs
 .installed.cfg
 lib
 lib64
+*.whl
 
 # Installer logs
 pip-log.txt
@@ -69,3 +70,4 @@ junit-*.xml
 
 # Local env
 .env
+/.venv
