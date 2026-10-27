@@ -11,6 +11,7 @@ authors = [{name = "Wil Cooley", email = "wcooley@nakedape.cc"}]
 license = {text = "MIT"}
 description = "Represent Neo4j graph data as YAML."
 dynamic = ["version"]
+requires-python = ">= 3.12"
 keywords = ["yaml", "py2neo", "neo4j", "gryaml"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
