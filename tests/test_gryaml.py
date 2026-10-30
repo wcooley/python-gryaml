@@ -1,29 +1,27 @@
-"""Tests for `gryaml` module."""
-from __future__ import print_function
 
+"""Tests for `gryaml` module."""
+
+from collections.abc import Callable
 from textwrap import dedent
 
-from typing import Callable, List, Union
-
+import py2neo_compat
 import pytest
 import yaml
 from boltons.iterutils import first
-
-import gryaml
-import py2neo_compat
-# noinspection PyProtectedMember
-from gryaml.pyyaml import _unregister as gryaml_unregister
 from py2neo_compat import (
-    cypher_execute,
-    foremost,
     Graph,
     Node,
+    Relationship,
+    cypher_execute,
+    foremost,
     node,
     rel,
-    Relationship,
-)  # noqa: F401
+)
 
-py2neo_compat.monkey_patch_py2neo()
+import gryaml
+
+# noinspection PyProtectedMember
+from gryaml.pyyaml import _unregister as gryaml_unregister
 
 
 @pytest.fixture(autouse=True)
@@ -34,8 +32,7 @@ def unregister_gryaml():
 
 @pytest.mark.usefixtures('graphdb_offline')
 @pytest.mark.unit
-def test_node_parameter_permutation_offline(sample_yaml):
-    # type: (Callable[[str], str]) -> None
+def test_node_parameter_permutation_offline(sample_yaml: (Callable[[str], str])) -> None:
     """Test nodes offline."""
     gryaml.register()
 
@@ -49,7 +46,7 @@ def test_node_parameter_permutation_offline(sample_yaml):
 
     # 2 nodes with 'person' label
     assert 2 == len([n for n in result if n.labels])
-    assert {'person'} == set(first(n.labels) for n in result if n.labels)
+    assert {'person'} == {first(n.labels) for n in result if n.labels}
 
     # 2 nodes with `occupation` property
     occupations = [n['occupation'] for n in result if n['occupation']]
@@ -58,8 +55,7 @@ def test_node_parameter_permutation_offline(sample_yaml):
 
 
 @pytest.mark.integration
-def test_node_parameter_permutations(graphdb, sample_yaml):
-    # type: (Graph, Callable[[str], str]) -> None
+def test_node_parameter_permutations(graphdb: Graph, sample_yaml: Callable[[str], str]) -> None:
     """Test node representation."""
     gryaml.register()
 
@@ -78,8 +74,7 @@ def test_node_parameter_permutations(graphdb, sample_yaml):
 
 @pytest.mark.usefixtures('graphdb_offline')
 @pytest.mark.unit
-def test_relationship_structures_offline(sample_yaml):
-    # type: (Callable[[str], str]) -> None
+def test_relationship_structures_offline(sample_yaml: Callable[[str], str]) -> None:
     """Test relationship representations offline."""
     gryaml.register()
 
@@ -97,8 +92,7 @@ def test_relationship_structures_offline(sample_yaml):
 
 
 @pytest.mark.integration
-def test_relationship_structures(graphdb, sample_yaml):
-    # type: (Graph, Callable[[str], str]) -> None
+def test_relationship_structures(graphdb: Graph, sample_yaml: Callable[[str], str]) -> None:
     """Test relationship representation."""
     gryaml.register()
 
@@ -115,8 +109,7 @@ def test_relationship_structures(graphdb, sample_yaml):
 
 @pytest.mark.usefixtures('graphdb_offline')
 @pytest.mark.unit
-def test_complex_related_graph_offline(sample_yaml):
-    # type: (Callable[[str], str]) -> None
+def test_complex_related_graph_offline(sample_yaml: Callable[[str], str]) -> None:
     """Test graph with multiples nodes & relationships offline."""
     gryaml.register()
 
@@ -132,8 +125,7 @@ def test_complex_related_graph_offline(sample_yaml):
 
 
 @pytest.mark.integration
-def test_complex_related_graph(graphdb, sample_yaml):
-    # type: (Graph, Callable[[str], str]) -> None
+def test_complex_related_graph(graphdb: Graph, sample_yaml: Callable[[str], str]) -> None:
     """Test loading a graph with multiple nodes & relationships."""
     gryaml.register()
 
@@ -147,8 +139,7 @@ def test_complex_related_graph(graphdb, sample_yaml):
 
 
 @pytest.fixture
-def sample_simple_rel():
-    # type: () -> Relationship
+def sample_simple_rel() -> Relationship:
     """Produce a sample relationship."""
     # Awkward underscore avoids even more awkward quoting.
     return rel(node({'name': 'Babs_Jensen'}),
@@ -157,8 +148,7 @@ def sample_simple_rel():
 
 
 @pytest.mark.integration
-def test_node_can_be_loaded_and_created(graphdb):
-    # type: (Relationship) -> None
+def test_node_can_be_loaded_and_created(graphdb: Graph) -> None:
     """Test loading a single node, creating in the DB and returning it."""
     gryaml.register()
 
@@ -182,8 +172,7 @@ def test_node_can_be_loaded_and_created(graphdb):
 
 
 @pytest.mark.unit
-def test_node_can_be_loaded_simple():
-    # type: () -> None
+def test_node_can_be_loaded_simple() -> None:
     """Test loading a single node with "simple" representation.
 
     The "simple" representation should return the same structure that would
@@ -209,8 +198,7 @@ def test_node_can_be_loaded_simple():
 
 
 @pytest.mark.unit
-def test_node_can_be_dumped(sample_simple_rel):
-    # type: (Relationship) -> None
+def test_node_can_be_dumped(sample_simple_rel: Relationship) -> None:
     """Test dump/represent Node."""
     gryaml.register()
 
@@ -233,8 +221,7 @@ def test_node_can_be_dumped(sample_simple_rel):
 
 
 @pytest.mark.unit
-def test_node_subclass_can_be_dumped():
-    # type: (Relationship) -> None
+def test_node_subclass_can_be_dumped() -> None:
     """Test dump/represent Node."""
     gryaml.register()
 
@@ -268,8 +255,7 @@ def test_node_subclass_can_be_dumped():
 
 
 @pytest.mark.unit
-def test_node_can_be_dumped_simple(sample_simple_rel):
-    # type: (Relationship) -> None
+def test_node_can_be_dumped_simple(sample_simple_rel: Relationship) -> None:
     """Test dump/represent Node."""
     gryaml.register_simple()
     # gryaml.register_simple(safe=False)
@@ -295,8 +281,7 @@ def test_node_can_be_dumped_simple(sample_simple_rel):
 
 
 @pytest.mark.integration
-def test_node_can_be_dumped_then_loaded(graphdb):
-    # type: (Graph) -> None
+def test_node_can_be_dumped_then_loaded(graphdb: Graph) -> None:
     """Ensure a node can be YAML-dumped and then YAML-loaded."""
     gryaml.register()
 
@@ -331,12 +316,11 @@ def test_node_can_be_dumped_then_loaded(graphdb):
 
 
 @pytest.mark.unit
-def test_rel_can_be_dumped(sample_simple_rel):
-    # type: (Relationship) -> None
+def test_rel_can_be_dumped(sample_simple_rel: Relationship) -> None:
     """Ensure a relationship and nodes can be dumped."""
     gryaml.register()
 
-    rel_yaml = yaml.dump(sample_simple_rel, canonical=True)  # type: str
+    rel_yaml: str = yaml.dump(sample_simple_rel, canonical=True)
 
     # Py2.7 w/py2neo2 ends up with a unicode tag and quoted "name",
     # so manually rip those out to avoid having to use a regex
@@ -369,12 +353,11 @@ def test_rel_can_be_dumped(sample_simple_rel):
 
 
 @pytest.mark.unit
-def test_rel_can_be_dumped_simple(sample_simple_rel):
-    # type: (Relationship) -> None
+def test_rel_can_be_dumped_simple(sample_simple_rel: Relationship) -> None:
     """Ensure a relationship and nodes can be dumped."""
     gryaml.register_simple()
 
-    rel_yaml = yaml.safe_dump(sample_simple_rel, canonical=True)  # type: str
+    rel_yaml: str = yaml.safe_dump(sample_simple_rel, canonical=True)
 
     # Py2.7 w/py2neo2 ends up with a unicode tag and quoted "name",
     # so manually rip those out to avoid having to use a regex
@@ -407,8 +390,7 @@ def test_rel_can_be_dumped_simple(sample_simple_rel):
 
 
 @pytest.mark.integration
-def test_rel_can_be_dumped_then_loaded(graphdb):
-    # type: (Graph) -> None
+def test_rel_can_be_dumped_then_loaded(graphdb: Graph) -> None:
     """Ensure a relationship and nodes can be dumped and loaded."""
     gryaml.register()
 
@@ -455,8 +437,7 @@ def test_rel_can_be_dumped_then_loaded(graphdb):
 @pytest.mark.skip_py2neo1
 @pytest.mark.todo
 @pytest.mark.integration
-def test_representers(graphdb):
-    # type: (Graph) -> None
+def test_representers(graphdb: Graph) -> None:
     # gryaml.register_simple()
     gryaml.register()
 
@@ -520,8 +501,7 @@ def test_representers(graphdb):
 @pytest.mark.todo
 @pytest.mark.skip_py2neo1
 @pytest.mark.integration
-def test_quoting(graphdb):
-    # type: (Graph) -> None
+def test_quoting(graphdb: Graph) -> None:
     """Test that quoting of labels, types, etc is as expected."""
     gryaml.register()
 
@@ -566,8 +546,7 @@ def test_quoting(graphdb):
 
 # Test helpers
 
-def assert_lana_directed_matrix(result):
-    # type: (List[Union[Node, Relationship]]) -> None
+def assert_lana_directed_matrix(result: list[Node | Relationship]) -> None:
     """Assert given relationship & nodes."""
     assert 1 == len(result)
     person, relationship, movie = first(result)
@@ -576,29 +555,25 @@ def assert_lana_directed_matrix(result):
     assert 'The Matrix' == movie['title']
 
 
-def match_all_nodes(graphdb):
-    # type: (Graph) -> List[Node]
+def match_all_nodes(graphdb: Graph) -> list[Node]:
     """Query for all nodes."""
     return [foremost(r) for r in cypher_execute(graphdb, 'MATCH (n) RETURN n')]
 
 
-def match_all_nodes_and_rels(graphdb):
-    # type: (Graph) -> List[List[Node, Relationship, Node]]
+def match_all_nodes_and_rels(graphdb: Graph) -> list[list[Node, Relationship, Node]]:
     """Query for all nodes and relationships."""
     return [list(r)
             for r in cypher_execute(graphdb, 'MATCH (n1)-[r]->(n2)'
                                             ' RETURN n1, r, n2')]
 
 
-def match_all_rels(graphdb):
-    # type: (Graph) -> List[Node]
+def match_all_rels(graphdb: Graph) -> list[Node]:
     """Query for all relationships."""
     return [foremost(r)
             for r in cypher_execute(graphdb, 'MATCH ()-[r]->() RETURN r')]
 
 
-def test_helpers(graphdb):
-    # type: (Graph) -> None
+def test_helpers(graphdb: Graph) -> None:
     """Ensure that test helpers work as expected."""
     r = cypher_execute(graphdb, """
         CREATE (cloudAtlas:Movie { title:"Cloud Atlas",released:2012 })

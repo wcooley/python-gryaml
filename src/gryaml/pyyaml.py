@@ -1,21 +1,16 @@
 """Support for dump/load w/PyYAML."""
-from __future__ import absolute_import, print_function
-
-from typing import Dict, List, Optional, Union
 
 import yaml
-
 from py2neo_compat import Node, Relationship, to_dict
-# from py2neo.cypher.core import Record
 
+# from py2neo.cypher.core import Record
 from . import node, rel
 
-node_tag = u'!gryaml.node'
-rel_tag = u'!gryaml.rel'
+node_tag = '!gryaml.node'
+rel_tag = '!gryaml.rel'
 
 
-def render_node(graph_node):
-    # type: (Node) -> List[Dict[str, Union[List[str], Dict[str, str]]]]
+def render_node(graph_node: Node) -> list[dict[str, list[str] | dict[str, str]]]:
     """Render a Neo4j node as a list
 
     A node is rendered as a 0-2 item list, with the following items:
@@ -44,34 +39,29 @@ def render_node(graph_node):
     return data
 
 
-def node_representer(dumper, graph_node):
-    # type: (yaml.BaseDumper, Node) -> yaml.SequenceNode
+def node_representer(dumper: yaml.BaseDumper, graph_node: Node) -> yaml.SequenceNode:
     """Represent a Neo4j node as YAML sequence with ''!gryaml.node'' tag."""
     return dumper.represent_sequence(node_tag,
                                      render_node(graph_node),
                                      flow_style=False)
 
 
-def node_representer_simple(dumper, graph_node):
-    # type: (yaml.SafeDumper, Node) -> yaml.SequenceNode
+def node_representer_simple(dumper: yaml.SafeDumper, graph_node: Node) -> yaml.SequenceNode:
     """Represent a Neo4j node as YAML list."""
     return dumper.represent_list(render_node(graph_node))
 
 
-def node_constructor_simple(loader, yaml_node):
-    # type: (yaml.SafeLoader, yaml.Node) -> List
+def node_constructor_simple(loader: yaml.SafeLoader, yaml_node: yaml.Node) -> list:
     """Construct "node" with only primitive Python types."""
     return loader.construct_sequence(yaml_node, deep=True)
 
 
-def node_constructor(loader, yaml_node):
-    # type: (yaml.BaseLoader, yaml.Node) -> Node
+def node_constructor(loader: yaml.BaseLoader, yaml_node: yaml.Node) -> Node:
     """Construct a Neo4j node from a YAML sequence."""
     return node(*node_constructor_simple(loader, yaml_node))
 
 
-def render_relationship(graph_rel):
-    # type: (Relationship) -> List
+def render_relationship(graph_rel: Relationship) -> list:
     """Render a Neo4j relationship as a list.
 
     Render relationships as a 3 or 4 item list:
@@ -96,34 +86,29 @@ def render_relationship(graph_rel):
     return data
 
 
-def rel_representer(dumper, graph_rel):
-    # type: (yaml.BaseDumper, Relationship) -> yaml.SequenceNode
+def rel_representer(dumper: yaml.BaseDumper, graph_rel: Relationship) -> yaml.SequenceNode:
     """Represent a Neo4j relationship as a YAML sequence node."""
     return dumper.represent_sequence(rel_tag,
                                      render_relationship(graph_rel),
                                      flow_style=False)
 
 
-def rel_representer_simple(dumper, graph_rel):
-    # type: (yaml.SafeDumper, Relationship) -> yaml.SequenceNode
+def rel_representer_simple(dumper: yaml.SafeDumper, graph_rel: Relationship) -> yaml.SequenceNode:
     """Represent a Neo4j relationship as a YAML sequence. """
     return dumper.represent_list(render_relationship(graph_rel))
 
 
-def rel_constructor_simple(loader, yaml_node):
-    # type: (yaml.BaseLoader, yaml.Node) -> List
+def rel_constructor_simple(loader: yaml.BaseLoader, yaml_node: yaml.Node) -> list:
     """Construct a sequence from a tagged YAML sequence."""
     return loader.construct_sequence(yaml_node, deep=True)
 
 
-def rel_constructor(loader, yaml_node):
-    # type: (yaml.BaseLoader, yaml.Node) -> Relationship
+def rel_constructor(loader: yaml.BaseLoader, yaml_node: yaml.Node) -> Relationship:
     """Construct a Neo4j relationship from a tagged YAML sequence."""
     return rel(*rel_constructor_simple(loader, yaml_node))
 
 
-def register(safe=False):
-    # type: (Optional[bool]) -> None
+def register(safe: bool | None = False) -> None:
     """Register representers & constructors for nodes & rels."""
 
     if safe:
@@ -140,8 +125,7 @@ def register(safe=False):
     yaml.add_constructor(rel_tag, rel_constructor, Loader=loader)
 
 
-def register_simple(safe=True):
-    # type: () -> None
+def register_simple(safe=True) -> None:
     """Register representers & constructors using only native YAML types."""
 
     if safe:
@@ -160,8 +144,7 @@ def register_simple(safe=True):
     yaml.add_constructor(rel_tag, rel_constructor_simple, Loader=loader)
 
 
-def _unregister():
-    # type: () -> None
+def _unregister() -> None:
     """Attempt to remove registered representers and constructors.
 
     This should probably only be used in testing, as manipulating the
