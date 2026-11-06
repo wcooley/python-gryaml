@@ -1,6 +1,17 @@
 History
 =======
 
+2026.11.5.0 (2026-11-5)
+-----------------------
+
+- Support only Python 3.12, py2neo 2021, Neo4j 3.5; drop all other
+  support.
+- Update to new Python style for a number of cases: f-strings, type hints, etc.
+- Update build system to use `pyproject.toml` exclusively.
+- Switch to CalVer versioning.
+- Convert to Markdown changelog.
+
+
 1.1.0 (2025-10-15)
 ------------------
 
