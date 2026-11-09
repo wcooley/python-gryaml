@@ -1,5 +1,9 @@
 # History
 
+## 2026.11.5.1 (2026-11-9)
+
+- Fix dependency specifier for _py2neo\_compat_ in `pyproject.toml`.
+
 ## 2026.11.5.0 (2026-11-5)
 
 - Support only Python 3.12, py2neo 2021, Neo4j 3.5; drop all other

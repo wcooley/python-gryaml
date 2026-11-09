@@ -26,7 +26,7 @@ urls = {Homepage = "https://github.com/wcooley/python-gryaml"}
 dependencies = [
     "boltons",
     "py2neo",
-    "py2neo_compat~=2026",
+    "py2neo_compat ~= 2026.0",
     "pyyaml",
 ]
 
