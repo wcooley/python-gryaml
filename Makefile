@@ -49,3 +49,14 @@ sdist: clean
 	python setup.py sdist
 	python setup.py bdist_wheel
 	ls -l dist
+
+
+RELEASE_VERSION = $(shell sed -n -E '/^\#\# /{s/^\#\# ([^ ]+).*$$/\1/; p; q;}' CHANGELOG.md)
+
+.PHONY: tag-message
+tag-message:
+	@printf "Release $(RELEASE_VERSION)\n\n"
+	@sed -n '4,/^## /p' CHANGELOG.md \
+		| sed '$$d'\
+		| sed -E 's/^##/#/' \
+		| pandoc -f markdown -t markdown --markdown-headings=setext
