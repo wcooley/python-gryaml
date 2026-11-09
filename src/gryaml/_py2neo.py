@@ -1,20 +1,16 @@
 """Compatability layer for :mod:`py2neo` versions."""
-from __future__ import absolute_import
+from collections.abc import Mapping
+from typing import Any
 
 from boltons.iterutils import first
-
-try:
-    from typing import Any, List, Mapping, Optional  # noqa: F401
-except ImportError:
-    """Module :mod:`typing` not required for Py27-compatible type comments."""
-
-import py2neo_compat
-
-from py2neo_compat import (  # noqa
-    Graph, Node, Relationship, create_node, foremost,
-    rel as py2neo_rel
+from py2neo_compat import (
+    Graph,
+    Node,
+    Relationship,
+    create_node,
+    foremost,
 )
-
+from py2neo_compat import rel as py2neo_rel
 
 try:
     from typing import TypeVar
@@ -24,13 +20,12 @@ except ImportError:
 
 # Avoid overwriting on reload
 try:
-    graphdb
+    graphdb: Graph
 except NameError:
-    graphdb = None  # type: Graph
+    graphdb: Graph = None
 
 
-def connect(uri=None, graph=None):
-    # type: (Optional[str], Optional[Graph]) -> Graph
+def connect(uri: str | None = None, graph: Graph | None = None) -> Graph:
     """Instantiate a module-level graph database connection."""
     global graphdb
 
@@ -42,8 +37,7 @@ def connect(uri=None, graph=None):
     return graphdb
 
 
-def is_arg_map(argname, mapping):
-    # type: (str, Mapping[str, Mapping]) -> bool
+def is_arg_map(argname: str, mapping: Mapping[str, Mapping]) -> bool:
     """Determine if p is an "arg map".
 
     I.e., a singleton mapping with key `argname` with the actual
@@ -60,20 +54,17 @@ def is_arg_map(argname, mapping):
     return argname in mapping and len(mapping) == 1
 
 
-def is_properties_map(mapping):
-    # type: (Mapping[str, Any]) -> bool
+def is_properties_map(mapping: Mapping[str, Any]) -> bool:
     """Determine if `mapping` is an "arg map" for properties."""
     return is_arg_map('properties', mapping)
 
 
-def is_label_map(mapping):
-    # type: (Mapping[str, Any]) -> bool
+def is_label_map(mapping: Mapping[str, Any]) -> bool:
     """Determine if `mapping` is an "arg map" for labels."""
     return is_arg_map('labels', mapping)
 
 
-def node(*args):
-    # type: (*Mapping[str,Any]) -> Node
+def node(*args: Mapping[str,Any]) -> Node:
     """`PyYAML` wrapper constructor for creating nodes.
 
     This allows the YAML node to have 'labels' and 'properties' instead of
@@ -99,8 +90,7 @@ def node(*args):
     return create_node(graph=graphdb, labels=labels, properties=properties)
 
 
-def resolve_rel_properties(properties=None):
-    # type: (Optional[Mapping[str, str]]) -> Mapping[str, str]
+def resolve_rel_properties(properties: Mapping[str, str] | None = None) -> Mapping[str, str]:
     """Extract properties from rel structure.
 
     This supports the properties of a rel being either an "arg map" with key
@@ -128,8 +118,7 @@ def resolve_rel_properties(properties=None):
     return properties
 
 
-def rel(head, reltype, tail, properties=None):
-    # type: (Node, str, Node, Optional[Mapping[str, str]]) -> Relationship
+def rel(head: Node, reltype: str, tail: Node, properties: Mapping[str, str] | None = None) -> Relationship:
     """Create relationships."""
     properties = resolve_rel_properties(properties)
     path = py2neo_rel(head, reltype, tail, **properties)

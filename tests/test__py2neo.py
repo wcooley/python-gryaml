@@ -1,11 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Tests for :mod:`gryaml._py2neo`."""
 
-from __future__ import print_function, absolute_import
-
-import pytest  # noqa
+import pytest
 
 
 @pytest.mark.integration
